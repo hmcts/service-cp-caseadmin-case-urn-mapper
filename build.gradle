@@ -3,6 +3,8 @@ plugins {
   id 'java'
   id 'io.spring.dependency-management' version '1.1.7'
   id 'org.springframework.boot' version '3.5.0'
+  id 'org.openapi.generator' version '7.13.0'
+  id 'com.diffplug.spotless' version '7.0.4'
   id 'jacoco'
   id 'maven-publish'
   id "com.github.ben-manes.versions" version "0.52.0"
@@ -11,7 +13,7 @@ plugins {
 
 
 group = 'uk.gov.hmcts.cp'
-version = System.getProperty('ARTEFACT_VERSION') ?: '0.0.999'
+version = System.getProperty('ARTEFACT_VERSION') ?: '0.1.0'
 
 def githubActor = project.findProperty("github.actor") ?: System.getenv("GITHUB_ACTOR")
 def githubToken = project.findProperty("github.token") ?: System.getenv("GITHUB_TOKEN")
@@ -21,26 +23,17 @@ def azureADOArtifactRepository = 'https://pkgs.dev.azure.com/hmcts/Artifacts/_pa
 def azureADOArtifactActor = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
 def azureADOArtifactToken = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
 
-//debugging
-//    if (githubActor != null) {
-//      println "🔐 Configuring GitHub Packages publishing to: https://maven.pkg.github.com/$githubRepo"
-//    }
-//    println "GitHub Packages publishing required environment variables:"
-//    println " - GITHUB_ACTOR=${githubActor != null ? ' ✔ FOUND' : '❌'}"
-//    println " - GITHUB_TOKEN=${githubToken != null ? ' ✔ FOUND' : '❌'}"
-//    println " - GITHUB_REPOSITORY=${githubRepo != null ? ' ✔ FOUND' : '❌'}"
-
-//println "Azure ADO publishing required environment variables:"
-//println " - AZURE_DEVOPS_ARTIFACT_USERNAME=${!azureADOArtifactActor || azureADOArtifactActor.isBlank() ? '❌NULL or EMPTY' : ' ✔ FOUND'}"
-//println " - AZURE_DEVOPS_ARTIFACT_USERNAME=${!azureADOArtifactToken || azureADOArtifactToken.isBlank() ? '❌NULL or EMPTY' : ' ✔ FOUND'}"
-
-
 java {
   sourceCompatibility = JavaVersion.VERSION_21
   targetCompatibility = JavaVersion.VERSION_21
 }
 
 sourceSets {
+  main {
+    java {
+      srcDir "$buildDir/generated/src/main/java"
+    }
+  }
   functionalTest {
     java {
       compileClasspath += sourceSets.main.output
@@ -220,10 +213,81 @@ jar {
 }
 
 bootJar {
-  archiveFileName = "${rootProject.name}-${project.version}.jar"
+  archiveFileName = "${rootProject.name}.jar"
 
   manifest {
     attributes('Implementation-Version': project.version.toString())
+  }
+}
+
+def inputSpecFile = fileTree("src/main/resources/openapi").matching {
+  include("*.openapi.yml")
+}.singleFile
+
+tasks.named("openApiGenerate") {
+  inputs.file(inputSpecFile)
+}
+
+//The OpenAPI generator automatically generates constructors for models based on the schema.
+openApiGenerate {
+  generatorName = "spring"
+  inputSpec = inputSpecFile.absolutePath
+  outputDir = "$buildDir/generated"
+  apiPackage = "uk.gov.hmcts.cp.openapi.api"
+  modelPackage = "uk.gov.hmcts.cp.openapi.model"
+  generateModelTests = true
+  generateApiTests = true
+  cleanupOutput = true
+  configOptions = [
+      validateSpec                  : "true",
+      dateLibrary                   : "java8",
+      interfaceOnly                 : "true",
+      hideGenerationTimestamp       : "true",
+      useJakartaEe                  : "true",
+      useBeanValidation             : "true",
+      useTags                       : "true",
+      useSpringBoot3                : "true",
+      implicitHeaders               : "false",
+      performBeanValidation         : "true",
+      additionalModelTypeAnnotations: "@lombok.Builder;@lombok.AllArgsConstructor;@lombok.NoArgsConstructor",
+      serializableModel             : "true",
+      openApiNullable               : "false"
+  ]
+}
+
+tasks.named('compileJava') {
+  dependsOn tasks.named('spotlessApply')
+}
+
+def formatterUrl = 'https://raw.githubusercontent.com/hmcts/api-cp-code-style/refs/heads/main/config/formatter/eclipse-formatter.xml'
+def formatterPath = "${layout.buildDirectory.get().asFile.absolutePath}/eclipse-formatter.xml"
+tasks.register('downloadFormatter') {
+  outputs.file(formatterPath)
+  doLast {
+    def file = new File(formatterPath)
+    file.parentFile.mkdirs()
+    file.text = new URI(formatterUrl).toURL().text
+  }
+}
+spotless {
+  java {
+    target 'build/generated/src/main/**/*.java'
+    removeUnusedImports()
+    eclipse().configFile(formatterPath)
+  }
+}
+
+tasks.named('spotlessApply') {
+  dependsOn tasks.named('openApiGenerate'), tasks.named('downloadFormatter')
+}
+tasks.named('spotlessJava') {
+  dependsOn tasks.named('openApiGenerate'), tasks.named('downloadFormatter')
+}
+
+tasks.withType(Checkstyle).configureEach {
+  def generatedDir = file("${layout.buildDirectory.get().asFile.absolutePath}/generated/src/main/java").canonicalPath
+  source = source.filter { file ->
+    !file.canonicalPath.startsWith(generatedDir)
   }
 }
 
@@ -232,17 +296,12 @@ application {
 }
 
 ext {
-  apiCourtScheduleVersion = "0.3.3-52d8907"
   log4JVersion = "2.24.3"
   logbackVersion = "1.5.18"
   lombokVersion = "1.18.38"
 }
 
 dependencies {
-  // NOTE: The scheduling and listing court schedule is included as a dependency as an example of how to use an API library.
-  // replace this with the actual API library you need for your project.
-  implementation "uk.gov.hmcts.cp:api-cp-crime-schedulingandlisting-courtschedule:$apiCourtScheduleVersion"
-
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
   implementation 'io.swagger.core.v3:swagger-core:2.2.32'
 
