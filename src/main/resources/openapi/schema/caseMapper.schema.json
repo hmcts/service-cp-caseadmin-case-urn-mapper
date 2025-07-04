@@ -3,6 +3,9 @@
   "$id": "caseMapper.schema.json",
   "title": "caseMapper",
   "type": "object",
+  "required": [
+    "caseUrn"
+  ],
   "properties": {
     "caseId": {
       "type": "string"
