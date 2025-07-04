@@ -2,7 +2,7 @@ plugins {
   id 'application'
   id 'java'
   id 'io.spring.dependency-management' version '1.1.7'
-  id 'org.springframework.boot' version '3.5.0'
+  id 'org.springframework.boot' version '3.5.3'
   id 'org.openapi.generator' version '7.14.0'
   id 'com.diffplug.spotless' version '7.0.4'
   id 'jacoco'
@@ -302,7 +302,7 @@ ext {
 
 dependencies {
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
-  implementation 'io.swagger.core.v3:swagger-core:2.2.33'
+  implementation 'io.swagger.core.v3:swagger-core:2.2.34'
 
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
