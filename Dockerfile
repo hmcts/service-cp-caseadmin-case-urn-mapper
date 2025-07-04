@@ -32,7 +32,7 @@ RUN addgroup --gid 2000 --system appgroup && \
 WORKDIR /app
 
 # Copy the built application JAR from the builder stage
-COPY --from=builder --chown=appuser:appgroup /app/build/libs/service-cp-case-urn-mapper.jar /app/app.jar
+COPY --from=builder --chown=appuser:appgroup /app/build/libs/service-cp-case-urn-mapper-*.jar /app/app.jar
 
 # Copy the Java agent (if required)
 #COPY --chown=appuser:appgroup agent.jar /app/agent.jar
