@@ -8,6 +8,8 @@ bin/*
 !gradle/wrapper/gradle-wrapper.jar
 *.class
 bin/main/application.yaml
+node_modules
+package*.json
 
 ### STS ###
 .apt_generated
