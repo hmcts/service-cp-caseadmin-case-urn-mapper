@@ -1,47 +1,47 @@
 package uk.gov.hmcts.cp.services;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.cache.support.CompositeCacheManager;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.cp.openapi.model.CaseMapperResponse;
+import uk.gov.hmcts.cp.repositories.CaseUrnCacheService;
 import uk.gov.hmcts.cp.repositories.CaseUrnMapperRepository;
 import uk.gov.hmcts.cp.repositories.InMemoryCaseUrnMapperRepositoryImpl;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CaseUrnMapperServiceTest {
 
-    private final CaseUrnMapperRepository caseUrnMapperRepository = new InMemoryCaseUrnMapperRepositoryImpl();
+    private final CompositeCacheManager cacheManager = new CompositeCacheManager();
+    private final CaseUrnCacheService cacheService = new CaseUrnCacheService(cacheManager);
+    private final CaseUrnMapperRepository caseUrnMapperRepository = new InMemoryCaseUrnMapperRepositoryImpl(cacheService);
     private final CaseUrnMapperService caseUrnMapperService = new CaseUrnMapperService(caseUrnMapperRepository);
 
     @Test
     void shouldReturnStubbedCaseIdResponse_whenValidCaseUrnProvided() {
-        // Arrange
         String validCaseUrn = "123-ABC-456";
 
-        // Act
-        CaseMapperResponse response = caseUrnMapperService.getCaseIdByCaseUrn(validCaseUrn);
+        CaseMapperResponse response = caseUrnMapperService.getCaseIdByCaseUrn(validCaseUrn, true);
 
-        // Assert
         assertEquals(validCaseUrn, response.getCaseUrn());
-        assertEquals(validCaseUrn + "-THIS-IS-CASE-ID", response.getCaseId());
+        assertNotNull(response.getCaseId());
+        assertTrue(response.getCaseId().startsWith(validCaseUrn + ":THIS-IS-CASE-ID:"));
     }
 
     @Test
     void shouldThrowBadRequestException_whenCaseUrnIsNull() {
-        // Arrange
         String nullCaseUrn = null;
 
-        // Act & Assert
-        assertThatThrownBy(() -> caseUrnMapperService.getCaseIdByCaseUrn(nullCaseUrn)).isInstanceOf(ResponseStatusException.class).hasMessageContaining("400 BAD_REQUEST").hasMessageContaining("caseUrn is required");
+        assertThatThrownBy(() -> caseUrnMapperService.getCaseIdByCaseUrn(nullCaseUrn, true)).isInstanceOf(ResponseStatusException.class).hasMessageContaining("400 BAD_REQUEST").hasMessageContaining("caseUrn is required");
     }
 
     @Test
     void shouldThrowBadRequestException_whenCaseUrnIsEmpty() {
-        // Arrange
         String emptyCaseUrn = "";
 
-        // Act & Assert
-        assertThatThrownBy(() -> caseUrnMapperService.getCaseIdByCaseUrn(emptyCaseUrn)).isInstanceOf(ResponseStatusException.class).hasMessageContaining("400 BAD_REQUEST").hasMessageContaining("caseUrn is required");
+        assertThatThrownBy(() -> caseUrnMapperService.getCaseIdByCaseUrn(emptyCaseUrn, true)).isInstanceOf(ResponseStatusException.class).hasMessageContaining("400 BAD_REQUEST").hasMessageContaining("caseUrn is required");
     }
 }

@@ -22,6 +22,12 @@ paths:
           description: Unique reference number for the case
           schema:
             type: string
+        - in: query
+          name: refresh
+          required: false
+          description: Refresh flag for cache
+          schema:
+            type: boolean
       responses:
         '200':
           description: Case found
