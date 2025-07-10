@@ -7,6 +7,6 @@ import uk.gov.hmcts.cp.openapi.model.CaseMapperResponse;
 @Repository
 public interface CaseUrnMapperRepository {
 
-    CaseMapperResponse getCaseIdByCaseUrn(String caseUrn);
+    CaseMapperResponse getCaseIdByCaseUrn(String caseUrn, Boolean refresh);
 
 }

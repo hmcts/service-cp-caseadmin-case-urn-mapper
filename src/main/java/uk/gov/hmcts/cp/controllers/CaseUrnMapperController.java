@@ -22,10 +22,10 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
     private final CaseUrnMapperService caseUrnMapperService;
 
     @Override
-    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn(final String caseUrn) {
+    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn(final String caseUrn, final Boolean refresh) {
         try {
             final String sanitizedCaseUrn = sanitizeCaseUrn(caseUrn);
-            final CaseMapperResponse caseMapperResponse = caseUrnMapperService.getCaseIdByCaseUrn(sanitizedCaseUrn);
+            final CaseMapperResponse caseMapperResponse = caseUrnMapperService.getCaseIdByCaseUrn(sanitizedCaseUrn, refresh);
             LOG.atDebug().log("Found case ID for caseUrn: {}", sanitizedCaseUrn);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)

@@ -18,13 +18,13 @@ public class CaseUrnMapperService {
 
     private final CaseUrnMapperRepository caseUrnMapperRepository;
 
-    public CaseMapperResponse getCaseIdByCaseUrn(final String caseUrn) throws ResponseStatusException {
+    public CaseMapperResponse getCaseIdByCaseUrn(final String caseUrn, final Boolean refresh) throws ResponseStatusException {
         if (StringUtils.isEmpty(caseUrn)) {
             LOG.atWarn().log("No case urn provided");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "caseUrn is required");
         }
         LOG.atWarn().log("NOTE: System configured to return stubbed Case ID details. Ignoring provided caseUrn : {}", caseUrn);
-        final CaseMapperResponse caseMapperResponse = caseUrnMapperRepository.getCaseIdByCaseUrn(caseUrn);
+        final CaseMapperResponse caseMapperResponse = caseUrnMapperRepository.getCaseIdByCaseUrn(caseUrn, refresh);
         LOG.atDebug().log("Case Mapper response: {}", caseMapperResponse);
         return caseMapperResponse;
     }
