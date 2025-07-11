@@ -31,7 +31,7 @@ class RootControllerIntegrationIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content()
-                        .string(containsString("Welcome to service-cp-case-urn-mapper")));
+                        .string(containsString("Welcome to service-cp-caseadmin-case-urn-mapper")));
     }
 
     @DisplayName("Actuator health status should be UP")

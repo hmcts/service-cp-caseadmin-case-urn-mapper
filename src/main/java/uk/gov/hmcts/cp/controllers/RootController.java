@@ -23,6 +23,6 @@ public class RootController {
      */
     @GetMapping("/")
     public ResponseEntity<String> welcome() {
-        return ok("Welcome to service-cp-case-urn-mapper");
+        return ok("Welcome to service-cp-caseadmin-case-urn-mapper");
     }
 }

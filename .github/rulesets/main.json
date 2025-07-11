@@ -3,7 +3,7 @@
   "name": "main",
   "target": "branch",
   "source_type": "Repository",
-  "source": "hmcts/service-cp-case-urn-mapper",
+  "source": "hmcts/service-cp-caseadmin-case-urn-mapper",
   "enforcement": "active",
   "conditions": {
     "ref_name": {
