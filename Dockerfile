@@ -1,48 +1,32 @@
 # ---- Base image (default fallback) ----
 ARG BASE_IMAGE
-FROM ${BASE_IMAGE:-openjdk:21-jdk-slim} AS builder
+FROM ${BASE_IMAGE:-openjdk:21-jdk-slim}
 
+# ---- Runtime arguments ----
+ARG JAR_FILENAME
+ARG JAR_FILE_PATH
 
-# Set the working directory
-WORKDIR /app
+ENV JAR_FILENAME=${JAR_FILENAME:-app.jar}
+ENV JAR_FILE_PATH=${JAR_FILE_PATH:-build/libs}
+ENV JAR_FULL_PATH=$JAR_FILE_PATH/$JAR_FILENAME
 
-# Copy all files to the working directory
-COPY . .
+# ---- Set runtime ENV for Spring Boot to bind port
+ARG SERVER_PORT
+ENV SERVER_PORT=${SERVER_PORT:-4550}
 
+# ---- Dependencies ----
+RUN apt-get update \
+    && apt-get install -y curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Build the application using Gradle
-RUN ./gradlew assemble -Dorg.gradle.daemon=false
+# ---- Application files ----
+COPY $JAR_FULL_PATH /opt/app/app.jar
+COPY lib/applicationinsights.json /opt/app/
 
-# Use Eclipse Temurin JRE for running the application
-FROM eclipse-temurin:21-jre-jammy
+# ---- Permissions ----
+RUN chmod 755 /opt/app/app.jar
 
-# Set the maintainer label
-LABEL maintainer="@hmcts/cp-x-cjs-data-api"
-
-# Update and upgrade the base image
-RUN apt-get update && \
-    apt-get -y upgrade && \
-    rm -rf /var/lib/apt/lists/*
-
-# Create a system user and group for running the application
-RUN addgroup --gid 2000 --system appgroup && \
-    adduser --uid 2000 --system appuser --gid 2000
-
-# Set the working directory
-WORKDIR /app
-
-# Copy the built application JAR from the builder stage
-COPY --from=builder --chown=appuser:appgroup /app/build/libs/service-cp-case-urn-mapper-*.jar /app/app.jar
-
-# Copy the Java agent (if required)
-#COPY --chown=appuser:appgroup agent.jar /app/agent.jar
-
-# Set the user to the created system user
-USER 2000
-
-# Define the entry point for the container
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-
-
-# Expose the application port
+# ---- Runtime ----
 EXPOSE 4550
+
+CMD ["java", "-jar", "/opt/app/app.jar"]

@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  service-cp-case-urn-mapper:
+  service-cp-caseadmin-case-urn-mapper:
     env_file:
       - .env
     build:
@@ -12,10 +12,13 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
         BASE_IMAGE: ${BASE_IMAGE}
-        JAR_FILE_PATH: ${JAR_FILE_PATH}
+        SERVER_PORT: ${SERVER_PORT}
         JAR_FILENAME: ${JAR_FILENAME}
+        JAR_FILE_PATH: ${JAR_FILE_PATH}
+    environment:
+      - SERVER_PORT=${SERVER_PORT:-4550}
     ports:
-      - $SERVER_PORT:$SERVER_PORT
+      - "${SERVER_PORT:-4550}:${SERVER_PORT:-4550}"
     networks:
       - service-network
     healthcheck:
@@ -27,4 +30,4 @@ services:
 
 networks:
   service-network:
-    name: service-cp-case-urn-mapper-network
+    name: service-cp-caseadmin-case-urn-mapper-network

@@ -1,4 +1,4 @@
-# HMCTS API Marketplace Service SpringBoot Template
+# Service: Common Platform (CP) Case Admin Case URN Mapper
 
 This repository provides a template for building Spring Boot applications within the HMCTS API Marketplace ecosystem. 
 It includes essential configurations, dependencies, and best practices to help you get started quickly.
