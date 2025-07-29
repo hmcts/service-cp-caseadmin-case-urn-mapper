@@ -4,7 +4,7 @@ plugins {
   id 'io.spring.dependency-management' version '1.1.7'
   id 'org.springframework.boot' version '3.5.4'
   id 'org.openapi.generator' version '7.14.0'
-  id 'com.diffplug.spotless' version '7.1.0'
+  id 'com.diffplug.spotless' version '7.2.1'
   id 'jacoco'
   id 'maven-publish'
   id "com.github.ben-manes.versions" version "0.52.0"
@@ -295,7 +295,7 @@ application {
 }
 
 ext {
-  log4JVersion = "2.24.3"
+  log4JVersion = "2.25.1"
   logbackVersion = "1.5.18"
   lombokVersion = "1.18.38"
 }
@@ -324,12 +324,12 @@ dependencies {
     exclude group: 'commons-logging', module: 'commons-logging'
   }
   implementation 'org.hibernate.validator:hibernate-validator:9.0.1.Final'
-  implementation 'org.apache.commons:commons-text:1.13.1'
+  implementation 'org.apache.commons:commons-text:1.14.0'
 
   compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
-  testImplementation(platform('org.junit:junit-bom:5.13.3'))
+  testImplementation(platform('org.junit:junit-bom:5.13.4'))
   testImplementation 'org.mockito:mockito-core:5.18.0'
   testRuntimeOnly 'org.mockito:mockito-inline:5.2.0'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
