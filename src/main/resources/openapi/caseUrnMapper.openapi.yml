@@ -9,7 +9,7 @@ info:
     name: MIT
     url: 'https://opensource.org/licenses/MIT'
 paths:
-  /case/{case_urn}:
+  /caseurnmapper/{case_urn}:
     post:
       description: Retrieve details of a case ID by case URN.
       operationId: getCaseIdByCaseUrn
@@ -56,6 +56,9 @@ components:
           description: Unique reference number for the case
           type: string
           example: "CASE-URN-EXAMPLE"
+        originalResponse:
+          description: Original response from mapper service
+          type: object
     ErrorResponse:
       type: object
       properties:

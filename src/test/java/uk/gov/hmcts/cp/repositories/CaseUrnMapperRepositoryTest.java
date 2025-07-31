@@ -1,45 +1,63 @@
 package uk.gov.hmcts.cp.repositories;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.cache.support.CompositeCacheManager;
 import uk.gov.hmcts.cp.openapi.model.CaseMapperResponse;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class CaseUrnMapperRepositoryTest {
 
+    private CaseUrnCacheService cacheService;
     private CaseUrnMapperRepository caseUrnMapperRepository;
 
     @BeforeEach
     void setUp() {
-        CompositeCacheManager cacheManager = new CompositeCacheManager();
-        CaseUrnCacheService cacheService = new CaseUrnCacheService(cacheManager);
+        cacheService = mock(CaseUrnCacheService.class);
         caseUrnMapperRepository = new InMemoryCaseUrnMapperRepositoryImpl(cacheService);
     }
 
     @Test
-    void getCaseIdByCaseUrn_shouldReturnCaseIdResponse() {
+    void getCaseIdByCaseUrn_shouldCall_getCachedCaseIdAndRefreshCache_ifNoRefresh() {
         String caseUrn = UUID.randomUUID().toString();
+
+        CaseMapperResponse caseMapperResponse = CaseMapperResponse.builder()
+                .caseUrn(caseUrn)
+                .caseId("mock-case-id")
+                .build();
+        when(cacheService.getCachedCaseIdAndRefreshCache(caseUrn)).thenReturn(caseMapperResponse);
+        when(cacheService.getCachedCaseId(caseUrn)).thenReturn(caseMapperResponse);
+
         CaseMapperResponse response = caseUrnMapperRepository.getCaseIdByCaseUrn(caseUrn, true);
 
-        assertEquals(caseUrn, response.getCaseUrn());
-        assertNotNull(response.getCaseId());
-        assertTrue(response.getCaseId().startsWith(caseUrn + ":THIS-IS-CASE-ID:"));
+        assertEquals(caseMapperResponse, response);
+        verify(cacheService, times(1)).getCachedCaseIdAndRefreshCache(eq(caseUrn));
+        verify(cacheService, times(0)).getCachedCaseId(eq(caseUrn));
     }
 
     @Test
-    void getCaseIdByCaseUrn_shouldReturnCaseIdResponse_unescaped() {
-        String caseUrn = "123.c0m$<123>";
-        CaseMapperResponse response = caseUrnMapperRepository.getCaseIdByCaseUrn(StringEscapeUtils.escapeHtml4(caseUrn), true);
+    void getCaseIdByCaseUrn_shouldCall_getCachedCaseId_ifNoRefresh() {
+        String caseUrn = UUID.randomUUID().toString();
 
-        assertEquals(caseUrn, response.getCaseUrn());
-        assertNotNull(response.getCaseId());
-        assertTrue(response.getCaseId().startsWith(caseUrn + ":THIS-IS-CASE-ID:"));
+        CaseMapperResponse caseMapperResponse = CaseMapperResponse.builder()
+                .caseUrn(caseUrn)
+                .caseId("mock-case-id")
+                .build();
+        when(cacheService.getCachedCaseIdAndRefreshCache(caseUrn)).thenReturn(caseMapperResponse);
+        when(cacheService.getCachedCaseId(caseUrn)).thenReturn(caseMapperResponse);
+
+        CaseMapperResponse response = caseUrnMapperRepository.getCaseIdByCaseUrn(caseUrn, false);
+
+        assertEquals(caseMapperResponse, response);
+        verify(cacheService, times(0)).getCachedCaseIdAndRefreshCache(eq(caseUrn));
+        verify(cacheService, times(1)).getCachedCaseId(eq(caseUrn));
     }
+
 }
