@@ -29,3 +29,7 @@ spring:
 azure:
   application-insights:
     instrumentation-key: ${rpe.AppInsightsInstrumentationKey:00000000-0000-0000-0000-000000000000}
+
+case-urn-mapper:
+  url: ${CASE_URN_MAPPER_URL:https://steccm64.ingress01.dev.nl.cjscp.org.uk/system-id-mapper-api/rest/systemid/mappings}
+  cjscppuid: ${CJSCPPUID:346112fe-bc47-4893-85a9-c6bc0c724538}
