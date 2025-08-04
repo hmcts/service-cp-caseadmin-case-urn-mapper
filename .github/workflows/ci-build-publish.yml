@@ -143,6 +143,8 @@ jobs:
           build-args: |
             BASE_IMAGE=openjdk:21-jdk-slim
             JAR_FILENAME=${{ needs.Build.outputs.artefact_name }}.jar
+            CASE_URN_MAPPER_URL=${{ env.CASE_URN_MAPPER_URL }}
+            CJSCPPUID=${{ env.CJSCPPUID }}
 
   Deploy:
     needs: [ Build, Artefact-Version ]
