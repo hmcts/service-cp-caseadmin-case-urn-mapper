@@ -10,9 +10,6 @@ ARG CASE_URN_MAPPER_URL
 ARG CJSCPPUID
 
 RUN required_variables=" \
-    SERVER_PORT  \
-    JAR_FILENAME  \
-    JAR_FILE_PATH  \
     CASE_URN_MAPPER_URL \
     CJSCPPUID \
 " &&  \
