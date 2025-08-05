@@ -10,7 +10,7 @@ info:
     url: 'https://opensource.org/licenses/MIT'
 paths:
   /caseurnmapper/{case_urn}:
-    post:
+    get:
       description: Retrieve details of a case ID by case URN.
       operationId: getCaseIdByCaseUrn
       tags:
