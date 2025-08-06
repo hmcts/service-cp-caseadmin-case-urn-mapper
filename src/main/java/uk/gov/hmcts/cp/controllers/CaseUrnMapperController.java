@@ -13,6 +13,8 @@ import uk.gov.hmcts.cp.openapi.api.CaseIdByCaseUrnApi;
 import uk.gov.hmcts.cp.openapi.model.CaseMapperResponse;
 import uk.gov.hmcts.cp.services.CaseUrnMapperService;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
@@ -34,6 +36,36 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
             LOG.atError().log(e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrnPost(String caseUrn, Boolean refresh) {
+        LOG.atDebug().log("POST request, Found case ID for caseUrn: {}", caseUrn);
+        return getCaseIdByCaseUrn(caseUrn, refresh);
+    }
+
+    @Override
+    public ResponseEntity<CaseMapperResponse> getTestCaseIdByCaseUrn(String caseUrn, Boolean refresh) {
+        CaseMapperResponse caseMapperResponse = CaseMapperResponse.builder()
+                .caseUrn(caseUrn)
+                .caseId(caseUrn + ":This-is-caseId-GET")
+                .originalResponse(Map.of("caseUrn", caseUrn))
+                .build();
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(caseMapperResponse);
+    }
+
+    @Override
+    public ResponseEntity<CaseMapperResponse> getTestCaseIdByCaseUrnPost(String caseUrn, Boolean refresh) {
+        CaseMapperResponse caseMapperResponse = CaseMapperResponse.builder()
+                .caseUrn(caseUrn)
+                .caseId(caseUrn + ":This-is-caseId-POST")
+                .originalResponse(Map.of("caseUrn", caseUrn))
+                .build();
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(caseMapperResponse);
     }
 
     private String sanitizeCaseUrn(final String urn) {
