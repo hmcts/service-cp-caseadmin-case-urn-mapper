@@ -45,8 +45,7 @@ public class CaseUrnCacheService {
 
         ResponseEntity<Object> responseEntity = caseUrnMapperClient.getCaseFileByCaseUrn(unescapedCaseUrn);
 
-        Object body = responseEntity.getBody();
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+        if (responseEntity != null && responseEntity.getStatusCode().is2xxSuccessful()) {
 
             //  Example response:
             //  {
@@ -58,6 +57,7 @@ public class CaseUrnCacheService {
             //     "createdAt": "2025-07-21T13:19:53.546Z"
             //  }
 
+            Object body = responseEntity.getBody();
             if (body instanceof Map<?, ?> mapBody) {
                 if (mapBody.containsKey(SOURCE_ID) && mapBody.containsKey(TARGET_ID)) {
                     final String sourceId = (String) mapBody.get(SOURCE_ID);
