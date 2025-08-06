@@ -24,6 +24,16 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
     private final CaseUrnMapperService caseUrnMapperService;
 
     @Override
+    public ResponseEntity<CaseMapperResponse> getTest() {
+        CaseMapperResponse caseMapperResponse = CaseMapperResponse.builder()
+                .caseUrn("this-is-test-case-urn")
+                .caseId("this-is-test-case-id")
+                .originalResponse(Map.of("test", "this-is-test"))
+                .build();
+        return ResponseEntity.ok(caseMapperResponse);
+    }
+
+    @Override
     public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn(final String caseUrn, final Boolean refresh) {
         try {
             final String sanitizedCaseUrn = sanitizeCaseUrn(caseUrn);
