@@ -9,12 +9,19 @@ info:
     name: MIT
     url: 'https://opensource.org/licenses/MIT'
 paths:
-  /test:
+  /test/{case_urn}:
     get:
       description: Retrieve details of a case ID by case URN.
       operationId: getTest
       tags:
         - case ID by case URN
+      parameters:
+        - in: path
+          name: case_urn
+          required: true
+          description: Unique reference number for the case
+          schema:
+            type: string
       responses:
         '200':
           description: Case found
