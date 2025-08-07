@@ -9,10 +9,138 @@ info:
     name: MIT
     url: 'https://opensource.org/licenses/MIT'
 paths:
-  /test/{case_urn}:
+  /urnmapper/{case_urn}:
     get:
       description: Retrieve details of a case ID by case URN.
-      operationId: getTest
+      operationId: getCaseIdByCaseUrn
+      tags:
+        - case ID by case URN
+      parameters:
+        - in: path
+          name: case_urn
+          required: true
+          description: Unique reference number for the case
+          schema:
+            type: string
+        - in: query
+          name: refresh
+          required: false
+          description: Refresh flag for cache
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Case found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseMapperResponse"
+        '400':
+          description: Bad input parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /urnmapper1/{case_urn}:
+    get:
+      description: Retrieve details of a case ID by case URN.
+      operationId: getCaseIdByCaseUrn1
+      tags:
+        - case ID by case URN
+      parameters:
+        - in: path
+          name: case_urn
+          required: true
+          description: Unique reference number for the case
+          schema:
+            type: string
+        - in: query
+          name: refresh
+          required: false
+          description: Refresh flag for cache
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Case found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseMapperResponse"
+        '400':
+          description: Bad input parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /urnmapper12/{case_urn}:
+    get:
+      description: Retrieve details of a case ID by case URN.
+      operationId: getCaseIdByCaseUrn12
+      tags:
+        - case ID by case URN
+      parameters:
+        - in: path
+          name: case_urn
+          required: true
+          description: Unique reference number for the case
+          schema:
+            type: string
+        - in: query
+          name: refresh
+          required: false
+          description: Refresh flag for cache
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Case found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseMapperResponse"
+        '400':
+          description: Bad input parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /urnmapper123/{case_urn}:
+    get:
+      description: Retrieve details of a case ID by case URN.
+      operationId: getCaseIdByCaseUrn123
+      tags:
+        - case ID by case URN
+      parameters:
+        - in: path
+          name: case_urn
+          required: true
+          description: Unique reference number for the case
+          schema:
+            type: string
+        - in: query
+          name: refresh
+          required: false
+          description: Refresh flag for cache
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Case found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseMapperResponse"
+        '400':
+          description: Bad input parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /urnmapper1234/{case_urn}:
+    get:
+      description: Retrieve details of a case ID by case URN.
+      operationId: getCaseIdByCaseUrn1234
       tags:
         - case ID by case URN
       parameters:
@@ -44,32 +172,6 @@ paths:
   /caseurnmapper/{case_urn}:
     get:
       description: Retrieve details of a case ID by case URN.
-      operationId: getCaseIdByCaseUrn
-      tags:
-        - case ID by case URN
-      parameters:
-        - in: path
-          name: case_urn
-          required: true
-          description: Unique reference number for the case
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Case found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CaseMapperResponse"
-        '400':
-          description: Bad input parameter
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  /urnmapper/{case_urn}:
-    get:
-      description: Retrieve details of a case ID by case URN.
       operationId: getCaseIdByCaseUrnMapper
       tags:
         - case ID by case URN
@@ -80,6 +182,12 @@ paths:
           description: Unique reference number for the case
           schema:
             type: string
+        - in: query
+          name: refresh
+          required: false
+          description: Refresh flag for cache
+          schema:
+            type: boolean
       responses:
         '200':
           description: Case found
