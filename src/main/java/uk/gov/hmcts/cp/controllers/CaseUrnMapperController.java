@@ -22,7 +22,17 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
     private final CaseUrnMapperService caseUrnMapperService;
 
     @Override
-    public ResponseEntity<CaseMapperResponse> getTest(String caseUrn) {
+    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn(final String caseUrn) {
+        return getTest(caseUrn, true);
+    }
+
+    @Override
+    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrnMapper(String caseUrn) {
+        return getTest(caseUrn, true);
+    }
+
+    @Override
+    public ResponseEntity<CaseMapperResponse> getTest(final String caseUrn, final Boolean refresh) {
         try {
             final String sanitizedCaseUrn = sanitizeCaseUrn(caseUrn);
             final CaseMapperResponse caseMapperResponse = caseUrnMapperService.getCaseIdByCaseUrn(sanitizedCaseUrn, false);
@@ -34,51 +44,6 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
             log.error(e.getMessage());
             throw e;
         }
-    }
-
-    @Override
-    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn(final String caseUrn, final Boolean refresh) {
-        try {
-            final String sanitizedCaseUrn = sanitizeCaseUrn(caseUrn);
-            final CaseMapperResponse caseMapperResponse = caseUrnMapperService.getCaseIdByCaseUrn(sanitizedCaseUrn, refresh);
-            log.debug("Found case ID for caseUrn: {}", sanitizedCaseUrn);
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(caseMapperResponse);
-        } catch (ResponseStatusException e) {
-            log.error(e.getMessage());
-            throw e;
-        }
-    }
-
-    @Override
-    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrnPost(String caseUrn, Boolean refresh) {
-        log.debug("POST request, Found case ID for caseUrn: {}", caseUrn);
-        return getCaseIdByCaseUrn(caseUrn, refresh);
-    }
-
-    @Override
-    public ResponseEntity<CaseMapperResponse> getTestCaseIdByCaseUrn(String caseUrn, Boolean refresh) {
-        CaseMapperResponse caseMapperResponse = CaseMapperResponse.builder()
-                .caseUrn(caseUrn)
-                .caseId(caseUrn + ":This-is-caseId-GET")
-                .originalResponse(Map.of("caseUrn", caseUrn))
-                .build();
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(caseMapperResponse);
-    }
-
-    @Override
-    public ResponseEntity<CaseMapperResponse> getTestCaseIdByCaseUrnPost(String caseUrn, Boolean refresh) {
-        CaseMapperResponse caseMapperResponse = CaseMapperResponse.builder()
-                .caseUrn(caseUrn)
-                .caseId(caseUrn + ":This-is-caseId-POST")
-                .originalResponse(Map.of("caseUrn", caseUrn))
-                .build();
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(caseMapperResponse);
     }
 
     private String sanitizeCaseUrn(final String urn) {
