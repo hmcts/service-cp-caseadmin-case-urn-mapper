@@ -74,6 +74,8 @@ jobs:
           CJSCPPUID: ${{ vars.CJSCPPUID }}
         run: |
           echo "Building with ARTEFACT_VERSION=$ARTEFACT_VERSION"
+          echo "Repository variables CASE_URN_MAPPER_URL=$CASE_URN_MAPPER_URL"
+          echo "Repository variables CJSCPPUID=$CJSCPPUID"
 
           gradle build -DARTEFACT_VERSION=$ARTEFACT_VERSION
 
