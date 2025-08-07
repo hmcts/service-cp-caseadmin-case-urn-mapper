@@ -1,5 +1,6 @@
 package uk.gov.hmcts.cp.client;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -102,10 +103,20 @@ public class CaseUrnMapperClient {
     }
 
     public String getCaseUrnMapper() {
-        return this.caseUrnMapper;
+        if (StringUtils.isNotBlank(caseUrnMapper)) {
+            log.info("caseUrnMapper is not blank {}", caseUrnMapper);
+            return caseUrnMapper;
+        }
+        log.error("caseUrnMapper is null {} or empty {}", caseUrnMapper == null, "".equals(caseUrnMapper));
+        return "https://steccm64.ingress01.dev.nl.cjscp.org.uk/system-id-mapper-api/rest/systemid/mappings";
     }
 
     public String getCjscppuid() {
-        return this.cjscppuid;
+        if (StringUtils.isNotBlank(cjscppuid)) {
+            log.info("cjscppuid is not blank {}", cjscppuid);
+            return cjscppuid;
+        }
+        log.error("cjscppuid is null {} or empty {}", cjscppuid == null, "".equals(cjscppuid));
+        return "346112fe-bc47-4893-85a9-c6bc0c724538";
     }
 }
