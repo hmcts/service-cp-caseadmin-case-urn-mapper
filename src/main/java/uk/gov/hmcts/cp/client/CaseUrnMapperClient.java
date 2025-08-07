@@ -37,7 +37,7 @@ public class CaseUrnMapperClient {
 
     protected String buildCaseUrnMapperUrl(String sourceId) {
         return UriComponentsBuilder
-                .fromUri(URI.create(getCaseUrnMapper()))
+                .fromUriString(getCaseUrnMapper())
                 .queryParam("sourceId", sourceId)
                 .queryParam("targetType", "CASE_FILE_ID")
                 .toUriString();
@@ -46,11 +46,14 @@ public class CaseUrnMapperClient {
     public ResponseEntity<Object> getCaseFileByCaseUrn(String sourceId) {
         try {
             final String url = buildCaseUrnMapperUrl(sourceId);
+            log.warn("Mapper API url {}", url);
             ignoreCertificates();
+            HttpEntity<String> requestEntity = getRequestEntity();
+            log.warn("Mapper API headers {}", requestEntity.toString());
             ResponseEntity<Object> responseEntity = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
-                    getRequestEntity(),
+                    requestEntity,
                     Object.class
             );
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {

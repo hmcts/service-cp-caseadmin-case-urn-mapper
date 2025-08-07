@@ -1,9 +1,8 @@
 package uk.gov.hmcts.cp.controllers;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +15,9 @@ import uk.gov.hmcts.cp.services.CaseUrnMapperService;
 import java.util.Map;
 
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CaseUrnMapperController.class);
 
     private final CaseUrnMapperService caseUrnMapperService;
 
@@ -28,12 +26,12 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
         try {
             final String sanitizedCaseUrn = sanitizeCaseUrn(caseUrn);
             final CaseMapperResponse caseMapperResponse = caseUrnMapperService.getCaseIdByCaseUrn(sanitizedCaseUrn, false);
-            LOG.atDebug().log("Found case ID for caseUrn: {}", sanitizedCaseUrn);
+            log.debug("Found case ID for caseUrn: {}", sanitizedCaseUrn);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(caseMapperResponse);
         } catch (ResponseStatusException e) {
-            LOG.atError().log(e.getMessage());
+            log.error(e.getMessage());
             throw e;
         }
     }
@@ -43,19 +41,19 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
         try {
             final String sanitizedCaseUrn = sanitizeCaseUrn(caseUrn);
             final CaseMapperResponse caseMapperResponse = caseUrnMapperService.getCaseIdByCaseUrn(sanitizedCaseUrn, refresh);
-            LOG.atDebug().log("Found case ID for caseUrn: {}", sanitizedCaseUrn);
+            log.debug("Found case ID for caseUrn: {}", sanitizedCaseUrn);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(caseMapperResponse);
         } catch (ResponseStatusException e) {
-            LOG.atError().log(e.getMessage());
+            log.error(e.getMessage());
             throw e;
         }
     }
 
     @Override
     public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrnPost(String caseUrn, Boolean refresh) {
-        LOG.atDebug().log("POST request, Found case ID for caseUrn: {}", caseUrn);
+        log.debug("POST request, Found case ID for caseUrn: {}", caseUrn);
         return getCaseIdByCaseUrn(caseUrn, refresh);
     }
 
