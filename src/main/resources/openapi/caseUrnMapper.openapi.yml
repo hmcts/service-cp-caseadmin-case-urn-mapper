@@ -22,63 +22,6 @@ paths:
           description: Unique reference number for the case
           schema:
             type: string
-      responses:
-        '200':
-          description: Case found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CaseMapperResponse"
-        '400':
-          description: Bad input parameter
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  /caseurnmapper/test/{case_urn}:
-    get:
-      description: Retrieve details of a case ID by case URN.
-      operationId: getTestCaseIdByCaseUrn
-      tags:
-        - case ID by case URN
-      parameters:
-        - in: path
-          name: case_urn
-          required: true
-          description: Unique reference number for the case
-          schema:
-            type: string
-        - in: query
-          name: refresh
-          required: false
-          description: Refresh flag for cache
-          schema:
-            type: boolean
-      responses:
-        '200':
-          description: Case found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CaseMapperResponse"
-        '400':
-          description: Bad input parameter
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-    post:
-      description: Retrieve details of a case ID by case URN.
-      operationId: getTestCaseIdByCaseUrnPost
-      tags:
-        - case ID by case URN
-      parameters:
-        - in: path
-          name: case_urn
-          required: true
-          description: Unique reference number for the case
-          schema:
-            type: string
         - in: query
           name: refresh
           required: false
@@ -111,12 +54,6 @@ paths:
           description: Unique reference number for the case
           schema:
             type: string
-        - in: query
-          name: refresh
-          required: false
-          description: Refresh flag for cache
-          schema:
-            type: boolean
       responses:
         '200':
           description: Case found
@@ -130,9 +67,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-    post:
+  /urnmapper/{case_urn}:
+    get:
       description: Retrieve details of a case ID by case URN.
-      operationId: getCaseIdByCaseUrnPost
+      operationId: getCaseIdByCaseUrnMapper
       tags:
         - case ID by case URN
       parameters:
@@ -142,12 +80,6 @@ paths:
           description: Unique reference number for the case
           schema:
             type: string
-        - in: query
-          name: refresh
-          required: false
-          description: Refresh flag for cache
-          schema:
-            type: boolean
       responses:
         '200':
           description: Case found
