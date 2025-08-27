@@ -33,7 +33,7 @@ class CaseUrnMapperControllerIT {
 //    @Test
     void shouldReturnOkWhenValidUrnIsProvided() throws Exception {
         final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/caseurnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -48,7 +48,7 @@ class CaseUrnMapperControllerIT {
 //    @Test
     void shouldReturnOkWhenValidUrnIsProvidedAndRefreshTrue() throws Exception {
         final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/caseurnmapper/{case_urn}?refresh=true", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -63,7 +63,7 @@ class CaseUrnMapperControllerIT {
 //    @Test
     void shouldReturnOkWhenValidUrnIsProvidedAndRefreshOne() throws Exception {
         final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/caseurnmapper/{case_urn}?refresh=1", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=1", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -78,7 +78,7 @@ class CaseUrnMapperControllerIT {
 //    @Test
     void shouldReturnOkWhenValidUrnIsProvidedAndRefreshFalse() throws Exception {
         final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/caseurnmapper/{case_urn}?refresh=false", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -93,7 +93,7 @@ class CaseUrnMapperControllerIT {
 //    @Test
     void shouldReturnOkWhenValidUrnIsProvidedAndRefreshZero() throws Exception {
         final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/caseurnmapper/{case_urn}?refresh=0", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=0", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -108,7 +108,7 @@ class CaseUrnMapperControllerIT {
 //    @Test
     void shouldReturnOkWhenValidUrnIsProvidedAndRefreshMissing() throws Exception {
         final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/caseurnmapper/{case_urn}?refresh", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -123,7 +123,7 @@ class CaseUrnMapperControllerIT {
 //    @Test
     void shouldReturnOkWhenValidUrnIsProvidedAndRefreshMissingWithEquality() throws Exception {
         final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/caseurnmapper/{case_urn}?refresh=", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -142,7 +142,7 @@ class CaseUrnMapperControllerIT {
         final String caseUrn = "CIK2JQKECS";
 
         // perform mapping search, value should be cached
-        mockMvc.perform(get("/caseurnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -155,7 +155,7 @@ class CaseUrnMapperControllerIT {
                 });
 
         // perform mapping search again, same value should be returned
-        mockMvc.perform(get("/caseurnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -164,7 +164,7 @@ class CaseUrnMapperControllerIT {
                 });
 
         // perform mapping search again, same value should be returned
-        mockMvc.perform(get("/caseurnmapper/{case_urn}?refresh=false", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -173,7 +173,7 @@ class CaseUrnMapperControllerIT {
                 });
 
         // perform mapping search again, same value should be returned
-        mockMvc.perform(get("/caseurnmapper/{case_urn}?refresh=0", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=0", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -182,7 +182,7 @@ class CaseUrnMapperControllerIT {
                 });
 
         // perform mapping search again, a new value should be generated, cached and returned
-        mockMvc.perform(get("/caseurnmapper/{case_urn}?refresh=true", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -194,7 +194,7 @@ class CaseUrnMapperControllerIT {
                 });
 
         // perform mapping search again, same value should be returned as previously changed
-        mockMvc.perform(get("/caseurnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
@@ -208,7 +208,7 @@ class CaseUrnMapperControllerIT {
         final String caseUrn = EncodeDecodeUtils.encode("<script>ZXCqwe123£$^&*()[]{}.,'|`~<script>");
         assertEquals("%3Cscript%3EZXCqwe123%C2%A3%24%5E%26*%28%29%5B%5D%7B%7D.%2C%27%7C%60%7E%3Cscript%3E", caseUrn);
 
-        mockMvc.perform(get("/caseurnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/urnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();

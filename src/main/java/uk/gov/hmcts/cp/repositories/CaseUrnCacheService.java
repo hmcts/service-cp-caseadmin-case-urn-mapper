@@ -65,7 +65,6 @@ public class CaseUrnCacheService {
                     return CaseMapperResponse.builder()
                             .caseUrn(sourceId)
                             .caseId(targetId)
-                            .originalResponse(mapBody)
                             .build();
                 }
             }
