@@ -12,8 +12,6 @@ import uk.gov.hmcts.cp.openapi.api.CaseIdByCaseUrnApi;
 import uk.gov.hmcts.cp.openapi.model.CaseMapperResponse;
 import uk.gov.hmcts.cp.services.CaseUrnMapperService;
 
-import java.util.Map;
-
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -23,31 +21,6 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
 
     @Override
     public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn(final String caseUrn, final Boolean refresh) {
-        return getCaseIdByCaseUrnMapper(caseUrn, refresh);
-    }
-
-    @Override
-    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn1(String caseUrn, Boolean refresh) {
-        return getCaseIdByCaseUrnMapper(caseUrn, refresh);
-    }
-
-    @Override
-    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn12(String caseUrn, Boolean refresh) {
-        return getCaseIdByCaseUrnMapper(caseUrn, refresh);
-    }
-
-    @Override
-    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn123(String caseUrn, Boolean refresh) {
-        return getCaseIdByCaseUrnMapper(caseUrn, refresh);
-    }
-
-    @Override
-    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn1234(String caseUrn, Boolean refresh) {
-        return getCaseIdByCaseUrnMapper(caseUrn, refresh);
-    }
-
-    @Override
-    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrnMapper(final String caseUrn, final Boolean refresh) {
         try {
             final String sanitizedCaseUrn = sanitizeCaseUrn(caseUrn);
             final CaseMapperResponse caseMapperResponse = caseUrnMapperService.getCaseIdByCaseUrn(sanitizedCaseUrn, false);

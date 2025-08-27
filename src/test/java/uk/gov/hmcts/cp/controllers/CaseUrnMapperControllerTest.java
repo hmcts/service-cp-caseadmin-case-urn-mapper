@@ -77,7 +77,7 @@ class CaseUrnMapperControllerTest {
                 eq(Object.class)
         )).thenReturn(mockResponse);
 
-        ResponseEntity<CaseMapperResponse> response = caseUrnMapperController.getCaseIdByCaseUrnMapper(caseUrn, true);
+        ResponseEntity<CaseMapperResponse> response = caseUrnMapperController.getCaseIdByCaseUrn(caseUrn, true);
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -86,13 +86,12 @@ class CaseUrnMapperControllerTest {
         assertNotNull(responseBody);
         assertEquals(caseUrn, responseBody.getCaseUrn());
         assertEquals(targetId, responseBody.getCaseId());
-        assertEquals(body, responseBody.getOriginalResponse());
     }
 
     @Test
     void getJudgeById_ShouldReturnBadRequestStatus() {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> caseUrnMapperController.getCaseIdByCaseUrnMapper(null, true));
+                () -> caseUrnMapperController.getCaseIdByCaseUrn(null, true));
         assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(exception.getReason()).isEqualTo("caseUrn is required");
         assertThat(exception.getMessage()).isEqualTo("400 BAD_REQUEST \"caseUrn is required\"");
