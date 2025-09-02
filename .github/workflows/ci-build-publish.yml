@@ -10,6 +10,10 @@ on:
       HMCTS_ADO_PAT:
         required: true
     inputs:
+      environment:
+        required: true
+        type: string
+        default: dev
       is_release:
         required: false
         type: boolean
@@ -27,6 +31,8 @@ on:
 jobs:
   Artefact-Version:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
     outputs:
       artefact_version: ${{ inputs.is_release && steps.artefact.outputs.release_version || steps.artefact.outputs.draft_version }}
     steps:
@@ -126,6 +132,8 @@ jobs:
     needs: [ Build, Artefact-Version ]
     if: ${{ inputs.trigger_docker }}
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v5
