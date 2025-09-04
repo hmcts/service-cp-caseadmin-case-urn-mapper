@@ -80,8 +80,10 @@ jobs:
           AZURE_DEVOPS_ARTIFACT_TOKEN: ${{ secrets.AZURE_DEVOPS_ARTIFACT_TOKEN }}
           CASE_URN_MAPPER_URL: ${{ vars.CASE_URN_MAPPER_URL }}
           CJSCPPUID: ${{ vars.CJSCPPUID }}
+          ENVIRONMENT: ${{ inputs.environment }}
         run: |
           echo "Building with ARTEFACT_VERSION=$ARTEFACT_VERSION"
+          echo "Active environment=$ENVIRONMENT"
           echo "Repository variables CASE_URN_MAPPER_URL=$CASE_URN_MAPPER_URL"
           echo "Repository variables CJSCPPUID=$CJSCPPUID"
 
