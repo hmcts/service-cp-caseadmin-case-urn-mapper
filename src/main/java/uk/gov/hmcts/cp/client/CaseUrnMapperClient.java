@@ -106,20 +106,22 @@ public class CaseUrnMapperClient {
     }
 
     public String getCaseUrnMapper() {
+        log.info("caseUrnMapper value {}", caseUrnMapper);
         if (StringUtils.isNotBlank(caseUrnMapper)) {
             log.info("caseUrnMapper is not blank {}", caseUrnMapper);
             return caseUrnMapper;
         }
         log.error("caseUrnMapper is null {} or empty {}", caseUrnMapper == null, "".equals(caseUrnMapper));
-        return "https://steccm64.ingress01.dev.nl.cjscp.org.uk/system-id-mapper-api/rest/systemid/mappings";
+        return null;
     }
 
     public String getCjscppuid() {
+        log.error("cjscppuid value {}", cjscppuid);
         if (StringUtils.isNotBlank(cjscppuid)) {
             log.info("cjscppuid is not blank {}", cjscppuid);
             return cjscppuid;
         }
         log.error("cjscppuid is null {} or empty {}", cjscppuid == null, "".equals(cjscppuid));
-        return "346112fe-bc47-4893-85a9-c6bc0c724538";
+        return null;
     }
 }
