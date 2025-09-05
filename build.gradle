@@ -297,7 +297,7 @@ application {
 ext {
   log4JVersion = "2.25.1"
   logbackVersion = "1.5.18"
-  lombokVersion = "1.18.38"
+  lombokVersion = "1.18.40"
 }
 
 dependencies {
