@@ -78,13 +78,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AZURE_DEVOPS_ARTIFACT_USERNAME: ${{ secrets.AZURE_DEVOPS_ARTIFACT_USERNAME }}
           AZURE_DEVOPS_ARTIFACT_TOKEN: ${{ secrets.AZURE_DEVOPS_ARTIFACT_TOKEN }}
-          CASE_URN_MAPPER_URL: ${{ vars.CASE_URN_MAPPER_URL }}
+          CP_BACKEND_URL: ${{ vars.CP_BACKEND_URL }}
           CJSCPPUID: ${{ vars.CJSCPPUID }}
           ENVIRONMENT: ${{ inputs.environment }}
         run: |
           echo "Building with ARTEFACT_VERSION=$ARTEFACT_VERSION"
           echo "Active environment=$ENVIRONMENT"
-          echo "Repository variables CASE_URN_MAPPER_URL=$CASE_URN_MAPPER_URL"
+          echo "Repository variables CP_BACKEND_URL=$CP_BACKEND_URL"
           echo "Repository variables CJSCPPUID=$CJSCPPUID"
 
           gradle build -DARTEFACT_VERSION=$ARTEFACT_VERSION
@@ -97,8 +97,8 @@ jobs:
             echo "::warning::AZURE_DEVOPS_ARTIFACT_TOKEN is null or not set"
           fi
 
-          if [ -z "$CASE_URN_MAPPER_URL" ]; then
-            echo "::warning::CASE_URN_MAPPER_URL is null or not set"
+          if [ -z "$CP_BACKEND_URL" ]; then
+            echo "::warning::CP_BACKEND_URL is null or not set"
           fi
 
           if [ -z "$CJSCPPUID" ]; then
@@ -115,7 +115,7 @@ jobs:
               -DGITHUB_TOKEN=$GITHUB_TOKEN \
               -DAZURE_DEVOPS_ARTIFACT_USERNAME=$AZURE_DEVOPS_ARTIFACT_USERNAME \
               -DAZURE_DEVOPS_ARTIFACT_TOKEN=$AZURE_DEVOPS_ARTIFACT_TOKEN \
-              -DCASE_URN_MAPPER_URL=$CASE_URN_MAPPER_URL \
+              -DCP_BACKEND_URL=$CP_BACKEND_URL \
               -DCJSCPPUID=$CJSCPPUID
           fi
 
@@ -169,7 +169,7 @@ jobs:
           build-args: |
             BASE_IMAGE=openjdk:21-jdk-slim
             JAR_FILENAME=${{ needs.Build.outputs.artefact_name }}.jar
-            CASE_URN_MAPPER_URL=${{ vars.CASE_URN_MAPPER_URL }}
+            CP_BACKEND_URL=${{ vars.CP_BACKEND_URL }}
             CJSCPPUID=${{ vars.CJSCPPUID }}
 
   Deploy:

@@ -33,7 +33,8 @@ class CaseUrnMapperControllerTest {
     private RestTemplate restTemplate;
     private CaseUrnMapperClient caseUrnMapperClient;
 
-    private final String url = "http://mock-server/mapper";
+    private final String url = "http://mock-server";
+    private final String path = "/system-id-mapper-api/rest/systemid/mappings";
     private final String cjscppuid = "mock-cjscppuid";
 
     @BeforeEach
@@ -41,8 +42,13 @@ class CaseUrnMapperControllerTest {
         restTemplate = mock(RestTemplate.class);
         caseUrnMapperClient = new CaseUrnMapperClient(restTemplate) {
             @Override
-            public String getCaseUrnMapper() {
+            public String getCpBackendUrl() {
                 return url;
+            }
+
+            @Override
+            public String getCaseUrnMapperPath() {
+                return path;
             }
 
             @Override
@@ -71,7 +77,7 @@ class CaseUrnMapperControllerTest {
 
 
         when(restTemplate.exchange(
-                eq(url + "?sourceId=" + caseUrn + "&targetType=CASE_FILE_ID"),
+                eq(url + path + "?sourceId=" + caseUrn + "&targetType=CASE_FILE_ID"),
                 eq(HttpMethod.GET),
                 eq(caseUrnMapperClient.getRequestEntity()),
                 eq(Object.class)

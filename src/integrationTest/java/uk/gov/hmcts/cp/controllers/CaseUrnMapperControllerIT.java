@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.cp.openapi.model.CaseMapperResponse;
@@ -23,6 +24,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestPropertySource(properties = {
+        "case-urn-mapper.url=https://ENTER_CORRECT_DOMAIN.org.uk",
+        "case-urn-mapper.path=/ENTER/CORRECT/PATH",
+        "case-urn-mapper.cjscppuid=ENTER-CORRECT-CJSCPPUID"
+})
 class CaseUrnMapperControllerIT {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
