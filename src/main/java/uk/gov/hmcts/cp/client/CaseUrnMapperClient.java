@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -18,10 +17,8 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.net.URI;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -31,7 +28,10 @@ public class CaseUrnMapperClient {
     private final RestTemplate restTemplate;
 
     @Value("${case-urn-mapper.url}")
-    private String caseUrnMapper;
+    private String cpBackendUrl;
+
+    @Value("${case-urn-mapper.path}")
+    private String caseUrnMapperPath;
 
     @Value("${case-urn-mapper.cjscppuid}")
     private String cjscppuid;
@@ -40,7 +40,8 @@ public class CaseUrnMapperClient {
 
     protected String buildCaseUrnMapperUrl(String sourceId) {
         return UriComponentsBuilder
-                .fromUriString(getCaseUrnMapper())
+                .fromUriString(getCpBackendUrl())
+                .path(getCaseUrnMapperPath())
                 .queryParam("sourceId", sourceId)
                 .queryParam("targetType", "CASE_FILE_ID")
                 .toUriString();
@@ -76,7 +77,6 @@ public class CaseUrnMapperClient {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.ACCEPT, "application/vnd.systemid.mapping+json");
         headers.add(CJSCPPUID_HEADER, getCjscppuid());
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return new HttpEntity<>(headers);
     }
 
@@ -105,13 +105,23 @@ public class CaseUrnMapperClient {
         }
     }
 
-    public String getCaseUrnMapper() {
-        log.info("caseUrnMapper value {}", caseUrnMapper);
-        if (StringUtils.isNotBlank(caseUrnMapper)) {
-            log.info("caseUrnMapper is not blank {}", caseUrnMapper);
-            return caseUrnMapper;
+    public String getCpBackendUrl() {
+        log.error("caseUrnMapper value {}", cpBackendUrl);
+        if (StringUtils.isNotBlank(cpBackendUrl)) {
+            log.info("caseUrnMapper is not blank {}", cpBackendUrl);
+            return cpBackendUrl;
         }
-        log.error("caseUrnMapper is null {} or empty {}", caseUrnMapper == null, "".equals(caseUrnMapper));
+        log.error("caseUrnMapper is null {} or empty {}", cpBackendUrl == null, "".equals(cpBackendUrl));
+        return null;
+    }
+
+    public String getCaseUrnMapperPath() {
+        log.error("caseUrnMapperPath value {}", caseUrnMapperPath);
+        if (StringUtils.isNotBlank(caseUrnMapperPath)) {
+            log.info("caseUrnMapperPath is not blank {}", caseUrnMapperPath);
+            return caseUrnMapperPath;
+        }
+        log.error("caseUrnMapperPath is null {} or empty {}", caseUrnMapperPath == null, "".equals(caseUrnMapperPath));
         return null;
     }
 

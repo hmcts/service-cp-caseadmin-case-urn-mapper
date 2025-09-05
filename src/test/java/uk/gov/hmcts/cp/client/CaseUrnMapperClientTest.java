@@ -21,7 +21,8 @@ class CaseUrnMapperClientTest {
 
     private RestTemplate restTemplate;
 
-    private final String url = "http://mock-server/mapper";
+    private final String url = "http://mock-server";
+    private final String path = "/system-id-mapper-api/rest/systemid/mappings";
     private final String cjscppuid = "mock-cjscppuid";
 
     @BeforeEach
@@ -29,8 +30,13 @@ class CaseUrnMapperClientTest {
         restTemplate = mock(RestTemplate.class);
         caseUrnMapperClient = new CaseUrnMapperClient(restTemplate) {
             @Override
-            public String getCaseUrnMapper() {
+            public String getCpBackendUrl() {
                 return url;
+            }
+
+            @Override
+            public String getCaseUrnMapperPath() {
+                return path;
             }
 
             @Override
@@ -43,7 +49,7 @@ class CaseUrnMapperClientTest {
     @Test
     void shouldBuildJudgesUrlCorrectly() {
         String sourceId = "SOURCE_ID_123";
-        String expectedUrl = "http://mock-server/mapper?sourceId=SOURCE_ID_123&targetType=CASE_FILE_ID";
+        String expectedUrl = "http://mock-server/system-id-mapper-api/rest/systemid/mappings?sourceId=SOURCE_ID_123&targetType=CASE_FILE_ID";
 
         String actualUrl = caseUrnMapperClient.buildCaseUrnMapperUrl(sourceId);
         assertThat(actualUrl).isEqualTo(expectedUrl);
@@ -52,7 +58,7 @@ class CaseUrnMapperClientTest {
     @Test
     void shouldReturnJudgeDetails_whenRequestSucceeds() {
         String sourceId = "SOURCE_ID_123";
-        String expectedUrl = "http://mock-server/mapper?sourceId=SOURCE_ID_123&targetType=CASE_FILE_ID";
+        String expectedUrl = "http://mock-server/system-id-mapper-api/rest/systemid/mappings?sourceId=SOURCE_ID_123&targetType=CASE_FILE_ID";
 
         Map<String, String> body = Map.of("key 1", "value 1");
         ResponseEntity<Object> mockResponse = new ResponseEntity<>(body, HttpStatus.OK);
@@ -73,7 +79,7 @@ class CaseUrnMapperClientTest {
     @Test
     void shouldReturnNull_whenRestTemplateThrowsException() {
         String sourceId = "SOURCE_ID_123";
-        String expectedUrl = "http://mock-server/mapper?sourceId=SOURCE_ID_123&targetType=CASE_FILE_ID";
+        String expectedUrl = "http://mock-server/system-id-mapper-api/rest/systemid/mappings?sourceId=SOURCE_ID_123&targetType=CASE_FILE_ID";
 
         when(restTemplate.exchange(
                 eq(expectedUrl),
