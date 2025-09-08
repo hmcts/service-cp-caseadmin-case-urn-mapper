@@ -84,8 +84,6 @@ jobs:
         run: |
           echo "Building with ARTEFACT_VERSION=$ARTEFACT_VERSION"
           echo "Active environment=$ENVIRONMENT"
-          echo "Repository variables CP_BACKEND_URL=$CP_BACKEND_URL"
-          echo "Repository variables CJSCPPUID=$CJSCPPUID"
 
           gradle build -DARTEFACT_VERSION=$ARTEFACT_VERSION
 
