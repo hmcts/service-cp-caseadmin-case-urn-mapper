@@ -32,7 +32,7 @@ azure:
 
 case-urn-mapper:
   url: ${CP_BACKEND_URL}
-  path: ${CP_BACKEND_PATH:/system-id-mapper-api/rest/systemid/mappings}
+  path: /system-id-mapper-api/rest/systemid/mappings
   cjscppuid: ${CJSCPPUID}
 
 logging:
