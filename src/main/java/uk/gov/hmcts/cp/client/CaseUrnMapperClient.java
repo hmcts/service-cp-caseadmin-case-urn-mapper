@@ -50,10 +50,8 @@ public class CaseUrnMapperClient {
     public ResponseEntity<Object> getCaseFileByCaseUrn(String sourceId) {
         try {
             final String url = buildCaseUrnMapperUrl(sourceId);
-            log.warn("Mapper API url {}", url);
             ignoreCertificates();
             HttpEntity<String> requestEntity = getRequestEntity();
-            log.warn("Mapper API headers {}", requestEntity.toString());
             ResponseEntity<Object> responseEntity = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
@@ -106,32 +104,26 @@ public class CaseUrnMapperClient {
     }
 
     public String getCpBackendUrl() {
-        log.error("caseUrnMapper value {}", cpBackendUrl);
         if (StringUtils.isNotBlank(cpBackendUrl)) {
-            log.info("caseUrnMapper is not blank {}", cpBackendUrl);
             return cpBackendUrl;
         }
-        log.error("caseUrnMapper is null {} or empty {}", cpBackendUrl == null, "".equals(cpBackendUrl));
+        log.error("cpBackendUrl is null or empty");
         return null;
     }
 
     public String getCaseUrnMapperPath() {
-        log.error("caseUrnMapperPath value {}", caseUrnMapperPath);
         if (StringUtils.isNotBlank(caseUrnMapperPath)) {
-            log.info("caseUrnMapperPath is not blank {}", caseUrnMapperPath);
             return caseUrnMapperPath;
         }
-        log.error("caseUrnMapperPath is null {} or empty {}", caseUrnMapperPath == null, "".equals(caseUrnMapperPath));
+        log.error("caseUrnMapperPath is null or empty");
         return null;
     }
 
     public String getCjscppuid() {
-        log.error("cjscppuid value {}", cjscppuid);
         if (StringUtils.isNotBlank(cjscppuid)) {
-            log.info("cjscppuid is not blank {}", cjscppuid);
             return cjscppuid;
         }
-        log.error("cjscppuid is null {} or empty {}", cjscppuid == null, "".equals(cjscppuid));
+        log.error("cjscppuid is null or empty");
         return null;
     }
 }
