@@ -95,14 +95,6 @@ jobs:
             echo "::warning::AZURE_DEVOPS_ARTIFACT_TOKEN is null or not set"
           fi
 
-          if [ -z "$CP_BACKEND_URL" ]; then
-            echo "::warning::CP_BACKEND_URL is null or not set"
-          fi
-
-          if [ -z "$CJSCPPUID" ]; then
-            echo "::warning::CJSCPPUID is null or not set"
-          fi
-
           if [ "${{ inputs.is_publish }}" == "true" ]; then
             echo "Publishing artefact for version: $ARTEFACT_VERSION"
 
