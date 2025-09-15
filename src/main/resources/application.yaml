@@ -37,4 +37,4 @@ case-urn-mapper:
 
 logging:
   level:
-    uk.gov.hmcts.cp: ERROR
+    uk.gov.hmcts.cp: INFO
