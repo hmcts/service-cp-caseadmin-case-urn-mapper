@@ -6,7 +6,7 @@ plugins {
     id 'jacoco'
     id 'maven-publish'
     id "com.github.ben-manes.versions" version "0.52.0"
-    id "org.cyclonedx.bom" version "2.3.1"
+    id "org.cyclonedx.bom" version "2.4.0"
 }
 
 group = 'uk.gov.hmcts.cp'
@@ -202,7 +202,7 @@ ext {
 dependencies {
     implementation "uk.gov.hmcts.cp:api-cp-caseadmin-case-urn-mapper:$apiCaseUrnMapperVersion"
 //  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.12'
-    implementation 'io.swagger.core.v3:swagger-core:2.2.36'
+    implementation 'io.swagger.core.v3:swagger-core:2.2.37'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
