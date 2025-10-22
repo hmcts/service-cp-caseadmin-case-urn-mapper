@@ -193,7 +193,7 @@ application {
 }
 
 ext {
-    apiCaseUrnMapperVersion = "1.0.1"
+    apiCaseUrnMapperVersion = "1.0.3"
     log4JVersion = "2.25.1"
     logbackVersion = "1.5.18"
     lombokVersion = "1.18.40"
