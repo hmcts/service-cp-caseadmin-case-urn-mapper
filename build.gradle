@@ -193,7 +193,7 @@ application {
 }
 
 ext {
-    apiCaseUrnMapperVersion = "1.0.3"
+    apiCaseUrnMapperVersion = "1.0.4"
     log4JVersion = "2.25.1"
     logbackVersion = "1.5.18"
     lombokVersion = "1.18.40"
@@ -201,8 +201,7 @@ ext {
 
 dependencies {
     implementation "uk.gov.hmcts.cp:api-cp-caseadmin-case-urn-mapper:$apiCaseUrnMapperVersion"
-//  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.12'
-    implementation 'io.swagger.core.v3:swagger-core:2.2.36'
+    implementation 'io.swagger.core.v3:swagger-core:2.2.38'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
