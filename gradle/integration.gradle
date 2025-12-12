@@ -1,0 +1,74 @@
+sourceSets {
+    integrationTest {
+        java.srcDir 'src/apiTest/java'
+        resources.srcDir 'src/apiTest/resources'
+
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+tasks.named('test') {
+    useJUnitPlatform{}
+    systemProperty 'API_SPEC_VERSION', project.version
+    failFast = true
+
+    jvmArgs += [
+            "-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains('mockito-core') }}",
+            '-Xshare:off'
+    ]
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat = 'full'
+        showStandardStreams = true
+    }
+
+    reports {
+        junitXml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+tasks.register('integration', Test) {
+    description = "Runs integration tests in src/apiTest"
+    group = "Verification"
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+
+    useJUnitPlatform()
+    shouldRunAfter test
+
+    failFast = true
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat = 'full'
+        showStandardStreams = true
+    }
+
+    reports {
+        junitXml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('integration')
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('test')
+    dependsOn tasks.named('integration')
+}
+cyclonedxBom {
+    includeConfigs = ["runtimeClasspath"]
+    skipConfigs = ["compileClasspath", "testImplementation"]
+    schemaVersion = "1.6"
+    componentVersion = providers.provider { project.version.toString() }
+    destination = file("$buildDir/reports")
+}
