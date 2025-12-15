@@ -13,6 +13,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.owasp.encoder.Encode;
 
 @Slf4j
 @Component
@@ -46,6 +47,10 @@ public class CaseUrnMapperClient {
 
         try {
             final String url = buildCaseUrnMapperUrl(sourceId);
+
+            // Log the URL safely for tracing
+            log.info("TracingFilter for uri: {}", Encode.forJava(url));
+
             final HttpEntity<String> requestEntity = getRequestEntity();
             final ResponseEntity<Object> responseEntity = restTemplate.exchange(
                     url,
@@ -69,10 +74,10 @@ public class CaseUrnMapperClient {
             response = ResponseEntity.notFound().build();
         } catch (HttpClientErrorException clientError) {
             log.error("Client error while calling System ID Mapper API", clientError);
-            response = ResponseEntity.status(503).build(); // return a response instead of null
+            response = ResponseEntity.status(503).build();
         } catch (RestClientException restClientException) {
             log.error("REST error while calling System ID Mapper API", restClientException);
-            response = ResponseEntity.status(503).build(); // return a response instead of null
+            response = ResponseEntity.status(503).build();
         }
 
         return response;
