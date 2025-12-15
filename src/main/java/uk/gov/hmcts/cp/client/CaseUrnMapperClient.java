@@ -47,10 +47,6 @@ public class CaseUrnMapperClient {
 
         try {
             final String url = buildCaseUrnMapperUrl(sourceId);
-
-            // Log the URL safely for tracing
-            log.info("TracingFilter for uri: {}", Encode.forJava(url));
-
             final HttpEntity<String> requestEntity = getRequestEntity();
             final ResponseEntity<Object> responseEntity = restTemplate.exchange(
                     url,
@@ -62,9 +58,9 @@ public class CaseUrnMapperClient {
             if (responseEntity != null && !responseEntity.getStatusCode().is2xxSuccessful()) {
                 log.error(
                         "Error while calling System ID Mapper API {}, status {}, body {}",
-                        sanitizeForLog(url),
+                        Encode.forJava(url),
                         responseEntity.getStatusCode(),
-                        sanitizeForLog(truncateForLog(String.valueOf(responseEntity.getBody())))
+                        truncateForLog(String.valueOf(responseEntity.getBody()))
                 );
             }
 
@@ -84,34 +80,12 @@ public class CaseUrnMapperClient {
     }
 
 
+
     public HttpEntity<String> getRequestEntity() {
         final HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.ACCEPT, "application/vnd.systemid.mapping+json");
         headers.add(CJSCPPUID_HEADER, getCjscppuid());
         return new HttpEntity<>(headers);
-    }
-
-    private String sanitizeForLog(final String input) {
-        final StringBuilder sanitized = new StringBuilder();
-        if (input != null) {
-            for (final char c : input.toCharArray()) {
-                switch (c) {
-                    case '\n':
-                        sanitized.append("\\n");
-                        break;
-                    case '\r':
-                        sanitized.append("\\r");
-                        break;
-                    case '\t':
-                        sanitized.append("\\t");
-                        break;
-                    default:
-                        sanitized.append(c);
-                        break;
-                }
-            }
-        }
-        return sanitized.toString();
     }
 
     private String truncateForLog(final String input) {
