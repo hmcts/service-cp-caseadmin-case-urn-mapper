@@ -42,7 +42,7 @@ public class CaseUrnMapperClient {
     }
 
     public ResponseEntity<Object> getCaseFileByCaseUrn(final String sourceId) {
-        ResponseEntity<Object> response = null;
+        ResponseEntity<Object> response;
 
         try {
             final String url = buildCaseUrnMapperUrl(sourceId);
@@ -54,7 +54,7 @@ public class CaseUrnMapperClient {
                     Object.class
             );
 
-            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+            if (responseEntity != null && !responseEntity.getStatusCode().is2xxSuccessful()) {
                 log.error(
                         "Error while calling System ID Mapper API {}, status {}, body {}",
                         sanitizeForLog(url),
@@ -62,18 +62,22 @@ public class CaseUrnMapperClient {
                         sanitizeForLog(truncateForLog(String.valueOf(responseEntity.getBody())))
                 );
             }
+
             response = responseEntity;
 
         } catch (HttpClientErrorException.NotFound notFound) {
             response = ResponseEntity.notFound().build();
         } catch (HttpClientErrorException clientError) {
             log.error("Client error while calling System ID Mapper API", clientError);
+            response = ResponseEntity.status(503).build(); // return a response instead of null
         } catch (RestClientException restClientException) {
             log.error("REST error while calling System ID Mapper API", restClientException);
+            response = ResponseEntity.status(503).build(); // return a response instead of null
         }
 
         return response;
     }
+
 
     public HttpEntity<String> getRequestEntity() {
         final HttpHeaders headers = new HttpHeaders();
