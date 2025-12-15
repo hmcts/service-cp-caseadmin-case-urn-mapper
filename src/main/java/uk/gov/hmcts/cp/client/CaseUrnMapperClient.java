@@ -14,15 +14,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -55,8 +46,6 @@ public class CaseUrnMapperClient {
 
         try {
             final String url = buildCaseUrnMapperUrl(sourceId);
-            ignoreCertificates();
-
             final HttpEntity<String> requestEntity = getRequestEntity();
             final ResponseEntity<Object> responseEntity = restTemplate.exchange(
                     url,
@@ -68,9 +57,9 @@ public class CaseUrnMapperClient {
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
                 log.error(
                         "Error while calling System ID Mapper API {}, status {}, body {}",
-                        url,
+                        sanitizeForLog(url),
                         responseEntity.getStatusCode(),
-                        responseEntity.getBody()
+                        sanitizeForLog(truncateForLog(String.valueOf(responseEntity.getBody())))
                 );
             }
             response = responseEntity;
@@ -93,60 +82,69 @@ public class CaseUrnMapperClient {
         return new HttpEntity<>(headers);
     }
 
-    private void ignoreCertificates() {
-        final TrustManager trustManager = new X509TrustManager() {
-
-            @Override
-            public X509Certificate[] getAcceptedIssuers() {
-                return new X509Certificate[0];
+    private String sanitizeForLog(final String input) {
+        final StringBuilder sanitized = new StringBuilder();
+        if (input != null) {
+            for (final char c : input.toCharArray()) {
+                switch (c) {
+                    case '\n':
+                        sanitized.append("\\n");
+                        break;
+                    case '\r':
+                        sanitized.append("\\r");
+                        break;
+                    case '\t':
+                        sanitized.append("\\t");
+                        break;
+                    default:
+                        sanitized.append(c);
+                        break;
+                }
             }
-
-            @Override
-            public void checkClientTrusted(final X509Certificate[] certs, final String authType) {
-                // intentionally ignored
-            }
-
-            @Override
-            public void checkServerTrusted(final X509Certificate[] certs, final String authType) {
-                // intentionally ignored
-            }
-        };
-
-        try {
-            final SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, new TrustManager[]{trustManager}, new SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            log.error("Error while ignoring SSL certificate", e);
         }
+        return sanitized.toString();
+    }
+
+    private String truncateForLog(final String input) {
+        final int maxLength = 200;
+        final String truncated;
+        if (input != null && input.length() > maxLength) {
+            truncated = input.substring(0, maxLength) + "...";
+        } else {
+            truncated = input;
+        }
+        return truncated;
     }
 
     public String getCpBackendUrl() {
-        String value = null;
+        final String value;
         if (StringUtils.isNotBlank(cpBackendUrl)) {
             value = cpBackendUrl;
         } else {
             log.error("cpBackendUrl is null or empty");
+            value = null;
         }
         return value;
     }
 
     public String getCaseUrnMapperPath() {
-        String value = null;
+        final String value;
         if (StringUtils.isNotBlank(caseUrnMapperPath)) {
             value = caseUrnMapperPath;
         } else {
             log.error("caseUrnMapperPath is null or empty");
+            value = null;
         }
         return value;
     }
 
     public String getCjscppuid() {
-        String value = null;
+        final String value;
         if (StringUtils.isNotBlank(cjscppuid)) {
             value = cjscppuid;
         } else {
             log.error("cjscppuid is null or empty");
+            value = null;
         }
         return value;
     }
