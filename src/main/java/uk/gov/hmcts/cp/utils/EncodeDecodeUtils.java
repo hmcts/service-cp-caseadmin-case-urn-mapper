@@ -11,15 +11,12 @@ import java.nio.charset.StandardCharsets;
 public class EncodeDecodeUtils {
 
     @SneakyThrows
-    public static String encode(String value) {
+    public static String encode(final String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
     @SneakyThrows
-    public static String decode(String value) {
+    public static String decode(final String value) {
         return URLDecoder.decode(value, StandardCharsets.UTF_8);
     }
-
-
-
 }

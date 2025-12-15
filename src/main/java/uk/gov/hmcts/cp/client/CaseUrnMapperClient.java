@@ -10,15 +10,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
+import org.owasp.encoder.Encode;
 
 @Slf4j
 @Component
@@ -38,7 +33,7 @@ public class CaseUrnMapperClient {
 
     public static final String CJSCPPUID_HEADER = "CJSCPPUID";
 
-    protected String buildCaseUrnMapperUrl(String sourceId) {
+    protected String buildCaseUrnMapperUrl(final String sourceId) {
         return UriComponentsBuilder
                 .fromUriString(getCpBackendUrl())
                 .path(getCaseUrnMapperPath())
@@ -47,83 +42,93 @@ public class CaseUrnMapperClient {
                 .toUriString();
     }
 
-    public ResponseEntity<Object> getCaseFileByCaseUrn(String sourceId) {
+    public ResponseEntity<Object> getCaseFileByCaseUrn(final String sourceId) {
+        ResponseEntity<Object> response;
+
         try {
             final String url = buildCaseUrnMapperUrl(sourceId);
-            ignoreCertificates();
-            HttpEntity<String> requestEntity = getRequestEntity();
-            ResponseEntity<Object> responseEntity = restTemplate.exchange(
+            final HttpEntity<String> requestEntity = getRequestEntity();
+            final ResponseEntity<Object> responseEntity = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     requestEntity,
                     Object.class
             );
-            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
-                log.error("Error while calling System ID Mapper API {}, Response status {}, body {}", url, responseEntity.getStatusCode(), responseEntity.getBody());
+
+            if (responseEntity != null && !responseEntity.getStatusCode().is2xxSuccessful()) {
+                log.error(
+                        "Error while calling System ID Mapper API {}, status {}, body {}",
+                        Encode.forJava(url),
+                        responseEntity.getStatusCode(),
+                        truncateForLog(String.valueOf(responseEntity.getBody()))
+                );
             }
-            return responseEntity;
-        } catch (Exception e) {
-            log.error("Error while calling System ID Mapper API", e);
-            if (e instanceof HttpClientErrorException.NotFound) {
-                return ResponseEntity.notFound().build();
-            }
+
+            response = responseEntity;
+
+        } catch (HttpClientErrorException.NotFound notFound) {
+            response = ResponseEntity.notFound().build();
+        } catch (HttpClientErrorException clientError) {
+            log.error("Client error while calling System ID Mapper API", clientError);
+            response = ResponseEntity.status(503).build();
+        } catch (RestClientException restClientException) {
+            log.error("REST error while calling System ID Mapper API", restClientException);
+            response = ResponseEntity.status(503).build();
         }
-        return null;
+
+        return response;
     }
 
+
+
     public HttpEntity<String> getRequestEntity() {
-        HttpHeaders headers = new HttpHeaders();
+        final HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.ACCEPT, "application/vnd.systemid.mapping+json");
         headers.add(CJSCPPUID_HEADER, getCjscppuid());
         return new HttpEntity<>(headers);
     }
 
-    private void ignoreCertificates() {
-        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-            @Override
-            public X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-
-            @Override
-            public void checkClientTrusted(X509Certificate[] certs, String authType) {
-            }
-
-            @Override
-            public void checkServerTrusted(X509Certificate[] certs, String authType) {
-            }
-        }};
-
-        try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, trustAllCerts, new SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        } catch (Exception e) {
-            log.error("Error while ignoring SSL certificate", e);
+    private String truncateForLog(final String input) {
+        final int maxLength = 200;
+        final String truncated;
+        if (input != null && input.length() > maxLength) {
+            truncated = input.substring(0, maxLength) + "...";
+        } else {
+            truncated = input;
         }
+        return truncated;
     }
 
     public String getCpBackendUrl() {
+        final String value;
         if (StringUtils.isNotBlank(cpBackendUrl)) {
-            return cpBackendUrl;
+            value = cpBackendUrl;
+        } else {
+            log.error("cpBackendUrl is null or empty");
+            value = null;
         }
-        log.error("cpBackendUrl is null or empty");
-        return null;
+        return value;
     }
 
     public String getCaseUrnMapperPath() {
+        final String value;
         if (StringUtils.isNotBlank(caseUrnMapperPath)) {
-            return caseUrnMapperPath;
+            value = caseUrnMapperPath;
+        } else {
+            log.error("caseUrnMapperPath is null or empty");
+            value = null;
         }
-        log.error("caseUrnMapperPath is null or empty");
-        return null;
+        return value;
     }
 
     public String getCjscppuid() {
+        final String value;
         if (StringUtils.isNotBlank(cjscppuid)) {
-            return cjscppuid;
+            value = cjscppuid;
+        } else {
+            log.error("cjscppuid is null or empty");
+            value = null;
         }
-        log.error("cjscppuid is null or empty");
-        return null;
+        return value;
     }
 }

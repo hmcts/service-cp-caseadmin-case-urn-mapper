@@ -92,4 +92,5 @@ class CaseUrnMapperClientTest {
 
         assertThat(response).isNull();
     }
+
 }
