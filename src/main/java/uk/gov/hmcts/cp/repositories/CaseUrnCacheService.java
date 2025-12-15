@@ -47,16 +47,6 @@ public class CaseUrnCacheService {
 
         if (responseEntity != null && responseEntity.getStatusCode().is2xxSuccessful()) {
 
-            //  Example response:
-            //  {
-            //     "mappingId": "xxxxxxxx-2e6b-4171-9a6e-xxxxxxxxxxxx",
-            //     "sourceId": "XXXXX12345",
-            //     "sourceType": "OU_URN",
-            //     "targetId": "xxxxxxxx-f092-415b-839c-xxxxxxxxxxxx",
-            //     "targetType": "CASE_FILE_ID",
-            //     "createdAt": "2025-07-21T13:19:53.546Z"
-            //  }
-
             Object body = responseEntity.getBody();
             if (body instanceof Map<?, ?> mapBody) {
                 if (mapBody.containsKey(SOURCE_ID) && mapBody.containsKey(TARGET_ID)) {

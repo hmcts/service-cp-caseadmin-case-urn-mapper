@@ -1,0 +1,21 @@
+jar {
+    enabled = true
+    archiveClassifier.set('plain')
+    if (file("CHANGELOG.md").exists()) {
+        from('CHANGELOG.md') {
+            into 'META-INF'
+        }
+    } else {
+        println "⚠️  CHANGELOG.md not found, skipping inclusion in JAR"
+    }
+}
+
+bootJar {
+    archiveFileName = "${rootProject.name}-${project.version}.jar"
+    manifest { attributes('Implementation-Version': project.version.toString()) }
+}
+
+
+tasks.withType(JavaExec).configureEach {
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+}
