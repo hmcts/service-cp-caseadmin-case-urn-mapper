@@ -85,11 +85,12 @@ class CaseUrnMapperClientTest {
                 eq(expectedUrl),
                 eq(HttpMethod.GET),
                 eq(caseUrnMapperClient.getRequestEntity()),
-                eq(String.class)
+                eq(Object.class)
         )).thenThrow(new RestClientException("Connection error"));
 
         ResponseEntity<Object> response = caseUrnMapperClient.getCaseFileByCaseUrn(sourceId);
 
         assertThat(response).isNull();
     }
+
 }
