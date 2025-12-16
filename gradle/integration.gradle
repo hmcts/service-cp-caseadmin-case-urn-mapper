@@ -65,10 +65,3 @@ tasks.named('build') {
     dependsOn tasks.named('test')
     dependsOn tasks.named('integration')
 }
-cyclonedxBom {
-    includeConfigs = ["runtimeClasspath"]
-    skipConfigs = ["compileClasspath", "testImplementation"]
-    schemaVersion = "1.6"
-    componentVersion = providers.provider { project.version.toString() }
-    destination = file("$buildDir/reports")
-}
