@@ -28,7 +28,7 @@ apply {
 }
 
 ext {
-  apiCaseUrnMapperVersion = "1.0.4"
+  apiCaseUrnMapperVersion = "1.0.5"
 }
 
 dependencies {
