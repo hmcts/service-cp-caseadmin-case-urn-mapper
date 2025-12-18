@@ -1,12 +1,10 @@
-package uk.gov.hmcts.cp.controllers;
+package uk.gov.hmcts.cp.integration;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsString;
@@ -16,13 +14,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@TestPropertySource(properties = {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, properties = {
         "case-urn-mapper.url=https://MOCK_DOMAIN.org.uk",
         "case-urn-mapper.cjscppuid=MOCK-CJSCPPUID"
 })
-class RootControllerIntegrationIT {
+@AutoConfigureMockMvc
+class RootControllerIntegrationIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
