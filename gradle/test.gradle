@@ -1,8 +1,0 @@
-tasks.named('jacocoTestReport') {
-    dependsOn tasks.named('test')
-    reports {
-        xml.required.set(true)
-        csv.required.set(false)
-        html.required.set(true)
-    }
-}

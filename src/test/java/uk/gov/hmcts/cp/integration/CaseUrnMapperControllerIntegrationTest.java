@@ -1,12 +1,10 @@
-package uk.gov.hmcts.cp.controllers;
+package uk.gov.hmcts.cp.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.cp.openapi.model.CaseMapperResponse;
 import uk.gov.hmcts.cp.utils.EncodeDecodeUtils;
@@ -20,21 +18,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@TestPropertySource(properties = {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, properties = {
         "case-urn-mapper.url=https://ENTER_CORRECT_DOMAIN.org.uk",
         "case-urn-mapper.path=/ENTER/CORRECT/PATH",
         "case-urn-mapper.cjscppuid=ENTER-CORRECT-CJSCPPUID"
 })
-class CaseUrnMapperControllerIT {
+@AutoConfigureMockMvc
+class CaseUrnMapperControllerIntegrationTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private MockMvc mockMvc;
 
-//    @Test
+    //    @Test
     void shouldReturnOkWhenValidUrnIsProvided() throws Exception {
         final String caseUrn = "CIK2JQKECS";
         mockMvc.perform(get("/urnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
@@ -49,7 +46,7 @@ class CaseUrnMapperControllerIT {
                 });
     }
 
-//    @Test
+    //    @Test
     void shouldReturnOkWhenValidUrnIsProvidedAndRefreshTrue() throws Exception {
         final String caseUrn = "CIK2JQKECS";
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", caseUrn).accept(MediaType.APPLICATION_JSON))
@@ -64,7 +61,7 @@ class CaseUrnMapperControllerIT {
                 });
     }
 
-//    @Test
+    //    @Test
     void shouldReturnOkWhenValidUrnIsProvidedAndRefreshOne() throws Exception {
         final String caseUrn = "CIK2JQKECS";
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=1", caseUrn).accept(MediaType.APPLICATION_JSON))
@@ -79,7 +76,7 @@ class CaseUrnMapperControllerIT {
                 });
     }
 
-//    @Test
+    //    @Test
     void shouldReturnOkWhenValidUrnIsProvidedAndRefreshFalse() throws Exception {
         final String caseUrn = "CIK2JQKECS";
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn).accept(MediaType.APPLICATION_JSON))
@@ -94,7 +91,7 @@ class CaseUrnMapperControllerIT {
                 });
     }
 
-//    @Test
+    //    @Test
     void shouldReturnOkWhenValidUrnIsProvidedAndRefreshZero() throws Exception {
         final String caseUrn = "CIK2JQKECS";
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=0", caseUrn).accept(MediaType.APPLICATION_JSON))
@@ -109,7 +106,7 @@ class CaseUrnMapperControllerIT {
                 });
     }
 
-//    @Test
+    //    @Test
     void shouldReturnOkWhenValidUrnIsProvidedAndRefreshMissing() throws Exception {
         final String caseUrn = "CIK2JQKECS";
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh", caseUrn).accept(MediaType.APPLICATION_JSON))
@@ -124,7 +121,7 @@ class CaseUrnMapperControllerIT {
                 });
     }
 
-//    @Test
+    //    @Test
     void shouldReturnOkWhenValidUrnIsProvidedAndRefreshMissingWithEquality() throws Exception {
         final String caseUrn = "CIK2JQKECS";
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=", caseUrn).accept(MediaType.APPLICATION_JSON))
@@ -139,7 +136,7 @@ class CaseUrnMapperControllerIT {
                 });
     }
 
-//    @Test
+    //    @Test
     void shouldRefreshResponse() throws Exception {
         AtomicReference<CaseMapperResponse> caseMapperResponse = new AtomicReference<>();
 
@@ -207,7 +204,7 @@ class CaseUrnMapperControllerIT {
                 });
     }
 
-//    @Test
+    //    @Test
     void shouldReturnNotFound() throws Exception {
         final String caseUrn = EncodeDecodeUtils.encode("<script>ZXCqwe123£$^&*()[]{}.,'|`~<script>");
         assertEquals("%3Cscript%3EZXCqwe123%C2%A3%24%5E%26*%28%29%5B%5D%7B%7D.%2C%27%7C%60%7E%3Cscript%3E", caseUrn);

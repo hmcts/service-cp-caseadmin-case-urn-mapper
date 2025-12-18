@@ -2,7 +2,7 @@ package uk.gov.hmcts.cp.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.StringEscapeUtils;
+import org.owasp.encoder.Encode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +38,6 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
         if (urn == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "caseUrn is required");
         }
-        return StringEscapeUtils.escapeHtml4(urn);
+        return Encode.forJava(urn);
     }
 }

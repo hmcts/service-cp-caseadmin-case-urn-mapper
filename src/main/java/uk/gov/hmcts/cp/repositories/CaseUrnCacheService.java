@@ -2,7 +2,7 @@ package uk.gov.hmcts.cp.repositories;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.StringEscapeUtils;
+import org.owasp.encoder.Encode;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
@@ -44,8 +44,7 @@ public class CaseUrnCacheService {
     }
 
     private CaseMapperResponse getCaseIdByCaseUrnFresh(final String caseUrn) {
-        final String unescapedCaseUrn = StringEscapeUtils.unescapeHtml4(caseUrn);
-
+        final String unescapedCaseUrn = Encode.forJava(caseUrn);
         final ResponseEntity<Object> responseEntity =
                 caseUrnMapperClient.getCaseFileByCaseUrn(unescapedCaseUrn);
 
