@@ -12,6 +12,7 @@ management:
       #   include: "db"
   endpoints:
     web:
+      # Odd to expose actuator info on root not the sensible default of /actuator/info etc
       base-path: /
       exposure:
         include: health, info, prometheus
