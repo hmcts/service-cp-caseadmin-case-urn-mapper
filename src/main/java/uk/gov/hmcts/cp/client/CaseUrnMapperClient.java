@@ -3,6 +3,7 @@ package uk.gov.hmcts.cp.client;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +14,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.owasp.encoder.Encode;
 
 @Slf4j
 @Component
@@ -43,43 +43,36 @@ public class CaseUrnMapperClient {
     }
 
     public ResponseEntity<Object> getCaseFileByCaseUrn(final String sourceId) {
-        ResponseEntity<Object> response;
-
         try {
             final String url = buildCaseUrnMapperUrl(sourceId);
-            final HttpEntity<String> requestEntity = getRequestEntity();
-            final ResponseEntity<Object> responseEntity = restTemplate.exchange(
+            log.info("get caseId from:{}", url);
+            final HttpEntity<String> request = getRequestEntity();
+            final ResponseEntity<Object> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
-                    requestEntity,
+                    request,
                     Object.class
             );
-
-            if (responseEntity != null && !responseEntity.getStatusCode().is2xxSuccessful()) {
+            log.info("get caseId response {} {}", response.getStatusCode(), response.getBody());
+            if (response != null && !response.getStatusCode().is2xxSuccessful()) {
                 log.error(
-                        "Error while calling System ID Mapper API {}, status {}, body {}",
+                        "get caseId error while calling System ID Mapper API {}, status {}, body {}",
                         Encode.forJava(url),
-                        responseEntity.getStatusCode(),
-                        truncateForLog(String.valueOf(responseEntity.getBody()))
+                        response.getStatusCode(),
+                        truncateForLog(String.valueOf(response.getBody()))
                 );
             }
-
-            response = responseEntity;
-
+            return response;
         } catch (HttpClientErrorException.NotFound notFound) {
-            response = ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build();
         } catch (HttpClientErrorException clientError) {
             log.error("Client error while calling System ID Mapper API", clientError);
-            response = ResponseEntity.status(503).build();
+            return ResponseEntity.status(503).build();
         } catch (RestClientException restClientException) {
             log.error("REST error while calling System ID Mapper API", restClientException);
-            response = ResponseEntity.status(503).build();
+            return ResponseEntity.status(503).build();
         }
-
-        return response;
     }
-
-
 
     public HttpEntity<String> getRequestEntity() {
         final HttpHeaders headers = new HttpHeaders();

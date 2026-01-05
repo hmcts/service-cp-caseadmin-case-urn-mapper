@@ -1,6 +1,20 @@
 services:
+  wiremock:
+    image: wiremock/wiremock:3.6.0
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src/apiTest/resources/mappings:/home/wiremock/mappings
+      - ./src/apiTest/resources/__files:/home/wiremock/__files
+    command:
+      - "--global-response-templating"
+      - "--verbose"
+
   app:
     build:
       dockerfile: Dockerfile
     ports:
       - "4550:4550"
+    environment:
+      CP_BACKEND_URL: "http://wiremock:8080"
+
