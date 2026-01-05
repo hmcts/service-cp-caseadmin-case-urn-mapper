@@ -42,6 +42,7 @@ public class CaseUrnMapperClient {
                 .toUriString();
     }
 
+    @SuppressWarnings("PMD.OnlyOneReturn")
     public ResponseEntity<Object> getCaseFileByCaseUrn(final String sourceId) {
         try {
             final String url = buildCaseUrnMapperUrl(sourceId);
