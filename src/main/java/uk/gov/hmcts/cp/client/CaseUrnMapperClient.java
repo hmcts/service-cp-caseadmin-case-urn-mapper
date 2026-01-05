@@ -53,7 +53,7 @@ public class CaseUrnMapperClient {
                     request,
                     Object.class
             );
-            log.info("get caseId response {} {}", response.getStatusCode(), response.getBody());
+            log.info("get caseId response {}", response.getStatusCode());
             if (response != null && !response.getStatusCode().is2xxSuccessful()) {
                 log.error(
                         "get caseId error while calling System ID Mapper API {}, status {}, body {}",
