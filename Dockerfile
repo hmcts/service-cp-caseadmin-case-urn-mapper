@@ -2,6 +2,9 @@ FROM eclipse-temurin:21
 
 WORKDIR /app
 
+# ---- Runtime arguments ----
+ARG CERTS_DIR
+
 # ---- Dependencies ----
 RUN apt-get update \
     && apt-get install -y curl \
