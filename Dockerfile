@@ -8,10 +8,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # ---- Application files ----
+COPY docker/* /app/
 COPY build/libs/*.jar /app/
 COPY lib/applicationinsights.json /app/
 
 # ---- Runtime ----
 EXPOSE 4550
 
-ENTRYPOINT ["sh","-c","exec java -jar $(ls /app/*.jar | grep -v 'plain' | head -n1)"]
+ENTRYPOINT ["/bin/sh","./startup.sh"]
