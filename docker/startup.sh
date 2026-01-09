@@ -6,8 +6,9 @@
 # Set source folder
 # ( We want to error in Dev but ot in Prod. How to do this ? Is there an env var we can use ? )
 # To set this when running the Docker we can ue "docker run img -e "CERTS_DIR=/etc/certs"
+echo "startup.sh running and loading certificates ..."
 if [ -z "$CERTS_DIR" ]; then
-    echo "Error - expects \$CERTS_DIR to be set. i.e. export CERTS_DIR="/etc/certs
+    echo "Warning - expects \$CERTS_DIR to be set. i.e. export CERTS_DIR="/etc/certs
     echo "Defaulting to /etc/certs"
     export CERTS_DIR="/etc/certs"
 fi
@@ -24,13 +25,19 @@ for FILE in $(ls $CERTS_DIR)
 do
     alias="nonprod$count"
     echo "Adding $CERTS_DIR/$FILE to truststore with alias $alias"
-    keytool -importcert -file $FILE -keystore $KEYSTORE -storepass changeit -alias $alias -noprompt
+    keytool -importcert -file $CERTS_DIR/$FILE -keystore $KEYSTORE -storepass changeit -alias $alias -noprompt
     count=$((count+1))
 done
 
 keytool -list -keystore $KEYSTORE -storepass changeit | grep "Your keystore contains"
 
-java -jar $(ls /app/*.jar | grep -v 'plain' | head -n1)
+export JARFILE=$(ls /app/*.jar | grep -v 'plain' | head -n1)
+if [ -f "$JARFILE" ]; then
+    echo "Running java jarfile $JARFILE"
+    java -jar $JARFILE
+else
+    echo "No jarfile found in /app"
+fi
 
 # Some useful keytool commands
 #
