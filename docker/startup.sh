@@ -4,7 +4,7 @@
 # The kubernetes startup will load any self signed certificates into /etc/certs
 # We load any certs found in the /etc/certs into the default truststore
 # The spring boot java app will load the certificates from the default truststore
-function logmsg {
+logmsg() {
     SCRIPTNAME=$(basename $0)
     echo "$SCRIPTNAME : $1"
 }
