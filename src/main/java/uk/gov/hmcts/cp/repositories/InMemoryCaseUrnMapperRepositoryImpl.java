@@ -14,7 +14,7 @@ public class InMemoryCaseUrnMapperRepositoryImpl implements CaseUrnMapperReposit
     @Override
     public CaseMapperResponse getCaseIdByCaseUrn(final String caseUrn, final boolean refresh) {
         return refresh
-                ? cacheService.getCachedCaseIdAndRefreshCache(caseUrn)
+                ? cacheService.getCaseIdAndRefreshCache(caseUrn)
                 : cacheService.getCachedCaseId(caseUrn);
     }
 }

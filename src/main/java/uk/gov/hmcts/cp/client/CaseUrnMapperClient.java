@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -41,15 +42,22 @@ public class CaseUrnMapperClient {
                 .toUriString();
     }
 
-    public ResponseEntity<Object> getCaseFileByCaseUrn(final String sourceId) {
+    public ResponseEntity<UrnMapperResponse> getCaseFileByCaseUrn(final String sourceId) {
         final String url = buildCaseUrnMapperUrl(sourceId);
         final HttpEntity<String> requestEntity = getRequestEntity();
-        return restTemplate.exchange(
+        log.info("getCaseFileByCaseUrn at url:{}", url);
+        ResponseEntity<UrnMapperResponse> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 requestEntity,
-                Object.class
+                UrnMapperResponse.class
         );
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new HttpServerErrorException(response.getStatusCode());
+        } else {
+            log.info("getCaseFileByCaseUrn response:{}", response);
+            return response;
+        }
     }
 
 

@@ -32,13 +32,13 @@ class CaseUrnMapperRepositoryTest {
                 .caseUrn(caseUrn)
                 .caseId("mock-case-id")
                 .build();
-        when(cacheService.getCachedCaseIdAndRefreshCache(caseUrn)).thenReturn(caseMapperResponse);
+        when(cacheService.getCaseIdAndRefreshCache(caseUrn)).thenReturn(caseMapperResponse);
         when(cacheService.getCachedCaseId(caseUrn)).thenReturn(caseMapperResponse);
 
         CaseMapperResponse response = caseUrnMapperRepository.getCaseIdByCaseUrn(caseUrn, true);
 
         assertEquals(caseMapperResponse, response);
-        verify(cacheService, times(1)).getCachedCaseIdAndRefreshCache(eq(caseUrn));
+        verify(cacheService, times(1)).getCaseIdAndRefreshCache(eq(caseUrn));
         verify(cacheService, times(0)).getCachedCaseId(eq(caseUrn));
     }
 
@@ -50,13 +50,13 @@ class CaseUrnMapperRepositoryTest {
                 .caseUrn(caseUrn)
                 .caseId("mock-case-id")
                 .build();
-        when(cacheService.getCachedCaseIdAndRefreshCache(caseUrn)).thenReturn(caseMapperResponse);
+        when(cacheService.getCaseIdAndRefreshCache(caseUrn)).thenReturn(caseMapperResponse);
         when(cacheService.getCachedCaseId(caseUrn)).thenReturn(caseMapperResponse);
 
         CaseMapperResponse response = caseUrnMapperRepository.getCaseIdByCaseUrn(caseUrn, false);
 
         assertEquals(caseMapperResponse, response);
-        verify(cacheService, times(0)).getCachedCaseIdAndRefreshCache(eq(caseUrn));
+        verify(cacheService, times(0)).getCaseIdAndRefreshCache(eq(caseUrn));
         verify(cacheService, times(1)).getCachedCaseId(eq(caseUrn));
     }
 

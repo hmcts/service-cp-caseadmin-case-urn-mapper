@@ -36,9 +36,10 @@ azure:
     instrumentation-key: ${rpe.AppInsightsInstrumentationKey:00000000-0000-0000-0000-000000000000}
 
 case-urn-mapper:
-  url: ${CP_BACKEND_URL:}
+  url: ${CP_BACKEND_URL:https://steccm64.ingress01.dev.nl.cjscp.org.uk}
   path: /system-id-mapper-api/rest/systemid/mappings
-  cjscppuid: ${CJSCPPUID:}
+  cjscppuid: ${CJSCPPUID:2ae15db9-a820-422a-b2f3-976361b568ba}
+
 
 logging:
   level:

@@ -43,8 +43,7 @@ class CaseUrnMapperClientTest {
 
     @Test
     void shouldReturnJudgeDetails_whenRequestSucceeds() {
-        Map<String, String> body = Map.of("key 1", "value 1");
-        ResponseEntity<Object> mockResponse = new ResponseEntity<>(body, HttpStatus.OK);
+        ResponseEntity<Object> mockResponse = new ResponseEntity<>(Map.of("key 1", "value 1"), HttpStatus.OK);
         when(restTemplate.exchange(
                 eq(expectedUrl),
                 eq(HttpMethod.GET),
@@ -52,9 +51,9 @@ class CaseUrnMapperClientTest {
                 eq(Object.class)
         )).thenReturn(mockResponse);
 
-        ResponseEntity<Object> response = caseUrnMapperClient.getCaseFileByCaseUrn(sourceId);
+        ResponseEntity<UrnMapperResponse> response = caseUrnMapperClient.getCaseFileByCaseUrn(sourceId);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getBody()).isEqualTo(body);
+        assertThat(response.getBody().getSourceId()).isEqualTo("key 1");
+        assertThat(response.getBody().getTargetId()).isEqualTo("value 1");
     }
 }
