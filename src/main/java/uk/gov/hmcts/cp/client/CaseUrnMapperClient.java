@@ -15,22 +15,22 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class CaseUrnMapperClient {
 
+    public static final String CJSCPPUID_HEADER = "CJSCPPUID";
+
     private final RestTemplate restTemplate;
     private final String cpBackendUrl;
     private final String caseUrnMapperPath;
     private final String cjscppuid;
 
-    public CaseUrnMapperClient(RestTemplate restTemplate,
-                               @Value("${case-urn-mapper.url}") String cpBackendUrl,
-                               @Value("${case-urn-mapper.path}") String caseUrnMapperPath,
-                               @Value("${case-urn-mapper.cjscppuid}") String cjscppuid) {
+    public CaseUrnMapperClient(final RestTemplate restTemplate,
+                               @Value("${case-urn-mapper.url}") final String cpBackendUrl,
+                               @Value("${case-urn-mapper.path}") final String caseUrnMapperPath,
+                               @Value("${case-urn-mapper.cjscppuid}") final String cjscppuid) {
         this.restTemplate = restTemplate;
         this.cpBackendUrl = cpBackendUrl;
         this.caseUrnMapperPath = caseUrnMapperPath;
         this.cjscppuid = cjscppuid;
     }
-
-    public static final String CJSCPPUID_HEADER = "CJSCPPUID";
 
     protected String buildCaseUrnMapperUrl(final String sourceId) {
         return UriComponentsBuilder
@@ -58,17 +58,6 @@ public class CaseUrnMapperClient {
         headers.add(HttpHeaders.ACCEPT, "application/vnd.systemid.mapping+json");
         headers.add(CJSCPPUID_HEADER, getCjscppuid());
         return new HttpEntity<>(headers);
-    }
-
-    private String truncateForLog(final String input) {
-        final int maxLength = 200;
-        final String truncated;
-        if (input != null && input.length() > maxLength) {
-            truncated = input.substring(0, maxLength) + "...";
-        } else {
-            truncated = input;
-        }
-        return truncated;
     }
 
     public String getCpBackendUrl() {

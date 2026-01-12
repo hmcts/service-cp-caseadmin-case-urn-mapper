@@ -21,7 +21,7 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
 
     @Override
     public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn(final String caseUrn, final Boolean refreshBoolean) {
-        boolean refresh = Boolean.TRUE.equals(refreshBoolean);
+        final boolean refresh = Boolean.TRUE.equals(refreshBoolean);
         try {
             final String sanitizedCaseUrn = sanitizeCaseUrn(caseUrn);
             final CaseMapperResponse caseMapperResponse = caseUrnMapperService.getCaseIdByCaseUrn(sanitizedCaseUrn, refresh);
