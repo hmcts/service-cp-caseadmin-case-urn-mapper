@@ -2,6 +2,9 @@ package uk.gov.hmcts.cp.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.cache.support.CompositeCacheManager;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -25,12 +28,15 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class CaseUrnMapperControllerTest {
+
+    @Mock
+    RestTemplate restTemplate;
 
     private CaseUrnMapperRepository caseUrnMapperRepository;
     private CaseUrnMapperService caseUrnMapperService;
     private CaseUrnMapperController caseUrnMapperController;
-    private RestTemplate restTemplate;
     private CaseUrnMapperClient caseUrnMapperClient;
 
     private final String url = "http://mock-server";
@@ -40,22 +46,7 @@ class CaseUrnMapperControllerTest {
     @BeforeEach
     void setUp() {
         restTemplate = mock(RestTemplate.class);
-        caseUrnMapperClient = new CaseUrnMapperClient(restTemplate) {
-            @Override
-            public String getCpBackendUrl() {
-                return url;
-            }
-
-            @Override
-            public String getCaseUrnMapperPath() {
-                return path;
-            }
-
-            @Override
-            public String getCjscppuid() {
-                return cjscppuid;
-            }
-        };
+        caseUrnMapperClient = new CaseUrnMapperClient(restTemplate, url, path, cjscppuid);
         CompositeCacheManager cacheManager = new CompositeCacheManager();
         CaseUrnCacheService cacheService = new CaseUrnCacheService(caseUrnMapperClient, cacheManager);
         caseUrnMapperRepository = new InMemoryCaseUrnMapperRepositoryImpl(cacheService);

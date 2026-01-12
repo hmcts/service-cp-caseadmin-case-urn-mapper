@@ -1,6 +1,7 @@
 package uk.gov.hmcts.cp.controllers;
 
 import io.micrometer.tracing.Tracer;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -34,6 +35,18 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(responseStatusException.getStatusCode())
+                .body(error);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(final Exception e) {
+        final ErrorResponse error = ErrorResponse.builder()
+                .message(e.getMessage())
+                .timestamp(Instant.now())
+                .traceId(Objects.requireNonNull(tracer.currentSpan()).context().traceId())
+                .build();
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(error);
     }
 }
