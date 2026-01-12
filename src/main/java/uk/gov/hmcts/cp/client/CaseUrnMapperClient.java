@@ -46,17 +46,17 @@ public class CaseUrnMapperClient {
         final String url = buildCaseUrnMapperUrl(sourceId);
         final HttpEntity<String> requestEntity = getRequestEntity();
         log.info("getCaseFileByCaseUrn at url:{}", url);
-        ResponseEntity<UrnMapperResponse> response = restTemplate.exchange(
+        final ResponseEntity<UrnMapperResponse> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 requestEntity,
                 UrnMapperResponse.class
         );
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new HttpServerErrorException(response.getStatusCode());
-        } else {
+        if (response.getStatusCode().is2xxSuccessful()) {
             log.info("getCaseFileByCaseUrn response:{}", response);
             return response;
+        } else {
+            throw new HttpServerErrorException(response.getStatusCode());
         }
     }
 
