@@ -53,9 +53,9 @@ public class CaseUrnMapperClient {
                 UrnMapperResponse.class
         );
         if (response.getStatusCode().is2xxSuccessful()) {
-            log.info("getCaseFileByCaseUrn response:{}", response);
             return response;
         } else {
+            log.error("getCaseFileByCaseUrn response:{}", response.getStatusCode());
             throw new HttpServerErrorException(response.getStatusCode());
         }
     }
