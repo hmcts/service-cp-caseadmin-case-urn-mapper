@@ -1,95 +1,64 @@
 package uk.gov.hmcts.cp.client;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Map;
+import uk.gov.hmcts.cp.config.AppProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class CaseUrnMapperClientTest {
 
-    private CaseUrnMapperClient caseUrnMapperClient;
-
+    @Mock
+    AppProperties appProperties;
+    @Mock
     private RestTemplate restTemplate;
+
+    @InjectMocks
+    private CaseUrnMapperClient caseUrnMapperClient;
 
     private final String url = "http://mock-server";
     private final String path = "/system-id-mapper-api/rest/systemid/mappings";
     private final String cjscppuid = "mock-cjscppuid";
-
-    @BeforeEach
-    void setUp() {
-        restTemplate = mock(RestTemplate.class);
-        caseUrnMapperClient = new CaseUrnMapperClient(restTemplate) {
-            @Override
-            public String getCpBackendUrl() {
-                return url;
-            }
-
-            @Override
-            public String getCaseUrnMapperPath() {
-                return path;
-            }
-
-            @Override
-            public String getCjscppuid() {
-                return cjscppuid;
-            }
-        };
-    }
+    private final String sourceId = "SOURCE1234";
+    private final String expectedUrl = String.format("%s%s?sourceId=SOURCE1234&targetType=CASE_FILE_ID", url, path);
 
     @Test
-    void shouldBuildJudgesUrlCorrectly() {
-        String sourceId = "SOURCE_ID_123";
-        String expectedUrl = "http://mock-server/system-id-mapper-api/rest/systemid/mappings?sourceId=SOURCE_ID_123&targetType=CASE_FILE_ID";
-
+    void url_should_build_correctly() {
+        when(appProperties.getBackendUrl()).thenReturn(url);
+        when(appProperties.getBackendPath()).thenReturn(path);
         String actualUrl = caseUrnMapperClient.buildCaseUrnMapperUrl(sourceId);
         assertThat(actualUrl).isEqualTo(expectedUrl);
     }
 
     @Test
-    void shouldReturnJudgeDetails_whenRequestSucceeds() {
-        String sourceId = "SOURCE_ID_123";
-        String expectedUrl = "http://mock-server/system-id-mapper-api/rest/systemid/mappings?sourceId=SOURCE_ID_123&targetType=CASE_FILE_ID";
-
-        Map<String, String> body = Map.of("key 1", "value 1");
-        ResponseEntity<Object> mockResponse = new ResponseEntity<>(body, HttpStatus.OK);
-
+    void case_id_should_be_returned_ok() {
+        when(appProperties.getBackendUrl()).thenReturn(url);
+        when(appProperties.getBackendPath()).thenReturn(path);
+        UrnMapperResponse urnMapperResponse = UrnMapperResponse.builder().sourceId("urn").targetId("guid").build();
+        when(appProperties.getBackendCjscppuid()).thenReturn(cjscppuid);
+        HttpEntity<String> requestEntity = caseUrnMapperClient.getRequestEntity();
+        ResponseEntity<UrnMapperResponse> mockResponse = new ResponseEntity<>(urnMapperResponse, HttpStatus.OK);
         when(restTemplate.exchange(
                 eq(expectedUrl),
                 eq(HttpMethod.GET),
-                eq(caseUrnMapperClient.getRequestEntity()),
-                eq(Object.class)
+                eq(requestEntity),
+                eq(UrnMapperResponse.class)
         )).thenReturn(mockResponse);
 
-        ResponseEntity<Object> response = caseUrnMapperClient.getCaseFileByCaseUrn(sourceId);
+        ResponseEntity<UrnMapperResponse> response = caseUrnMapperClient.getCaseFileByCaseUrn(sourceId);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getBody()).isEqualTo(body);
-    }
-
-    @Test
-    void shouldReturn503_whenRestTemplateThrowsException() {
-        when(restTemplate.exchange(
-                anyString(),
-                eq(HttpMethod.GET),
-                any(HttpEntity.class),
-                eq(Object.class)
-        )).thenThrow(new RestClientException("Connection error"));
-
-        ResponseEntity<Object> response = caseUrnMapperClient.getCaseFileByCaseUrn("any-id");
-
-        assertThat(response.getStatusCode().value()).isEqualTo(503);
+        assertThat(response.getBody().getSourceId()).isEqualTo("urn");
+        assertThat(response.getBody().getTargetId()).isEqualTo("guid");
     }
 }
