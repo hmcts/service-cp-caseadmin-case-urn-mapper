@@ -34,6 +34,8 @@ class CaseUrnMapperControllerIntegrationTest {
     String backendRootUrl;
     @Value("${case-urn-mapper.path}")
     String backendPath;
+    @Value("${case-urn-mapper.cjscppuid}")
+    String cjscppuid;
 
     @Autowired
     private MockMvc mockMvc;
@@ -41,13 +43,11 @@ class CaseUrnMapperControllerIntegrationTest {
     RestTemplate restTemplate;
 
     private String caseUrn = "CIK2JQKECS";
-    private String sourceId = "CIK2JQKECS";
-    private String targetId = "f552dee6-f092-415b-839c-5e5b5f46635e";
     private String caseId = "f552dee6-f092-415b-839c-5e5b5f46635e";
 
     @Test
     void refresh_false_should_return_ok() throws Exception {
-        UrnMapperResponse response = UrnMapperResponse.builder().sourceId(sourceId).targetId(targetId).build();
+        UrnMapperResponse response = UrnMapperResponse.builder().sourceId(caseUrn).targetId(caseId).build();
         mockRestResponse(HttpStatus.OK, response);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn))
                 .andDo(print())
@@ -58,7 +58,7 @@ class CaseUrnMapperControllerIntegrationTest {
 
     @Test
     void refresh_true_should_return_ok() throws Exception {
-        UrnMapperResponse response = UrnMapperResponse.builder().sourceId(sourceId).targetId(targetId).build();
+        UrnMapperResponse response = UrnMapperResponse.builder().sourceId(caseUrn).targetId(caseId).build();
         mockRestResponse(HttpStatus.OK, response);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", caseUrn))
                 .andDo(print())
@@ -69,7 +69,7 @@ class CaseUrnMapperControllerIntegrationTest {
 
     @Test
     void refresh_false_should_return_cached_value() throws Exception {
-        UrnMapperResponse response1 = UrnMapperResponse.builder().sourceId(sourceId).targetId(targetId).build();
+        UrnMapperResponse response1 = UrnMapperResponse.builder().sourceId(caseUrn).targetId(caseId).build();
         mockRestResponse(HttpStatus.OK, response1);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn))
                 .andDo(print())
@@ -77,7 +77,7 @@ class CaseUrnMapperControllerIntegrationTest {
                 .andExpect(jsonPath("$.caseUrn").value(caseUrn))
                 .andExpect(jsonPath("$.caseId").value(caseId));
 
-        UrnMapperResponse response2 = UrnMapperResponse.builder().sourceId(sourceId).targetId("ANOTHER").build();
+        UrnMapperResponse response2 = UrnMapperResponse.builder().sourceId(caseUrn).targetId("ANOTHER").build();
         mockRestResponse(HttpStatus.OK, response2);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn))
                 .andDo(print())
@@ -107,7 +107,7 @@ class CaseUrnMapperControllerIntegrationTest {
 
     @Test
     void not_exist_should_throw_404() throws Exception {
-        UrnMapperResponse response = UrnMapperResponse.builder().sourceId(sourceId).build();
+        UrnMapperResponse response = UrnMapperResponse.builder().sourceId(caseUrn).build();
         mockRestResponse(HttpStatus.NOT_FOUND, response);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", caseUrn))
                 .andDo(print())
@@ -143,7 +143,7 @@ class CaseUrnMapperControllerIntegrationTest {
     private HttpEntity expectedRequest() {
         final HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.ACCEPT, "application/vnd.systemid.mapping+json");
-        headers.add(CJSCPPUID_HEADER, "2ae15db9-a820-422a-b2f3-976361b568ba");
+        headers.add(CJSCPPUID_HEADER, cjscppuid);
         return new HttpEntity<>(headers);
     }
 }
