@@ -31,15 +31,18 @@ public class SpringLoggingIntegrationTest {
     }
 
     @Test
-    void springboot_test_should_log_correct_fields() throws IOException {
+    void simple_logging_test(){
+        log.info("First Simple log message APPEARS");
+        log.info("Second Log message with exception DOES NOT APPEAR", new RuntimeException("Colin Exception"));
+        log.info("Third Simple log message APPEARS");
+    }
+
+    @Test
+    void springboot_test_should_log_correct_fields_including_exception() throws IOException {
         MDC.put("any-mdc-field", "1234-1234");
         ByteArrayOutputStream capturedStdOut = captureStdOut();
-        log.info("spring boot test message");
-
-        AsyncAppender asyncAppender = (AsyncAppender) ((ch.qos.logback.classic.Logger) LoggerFactory
-                .getLogger("ROOT"))
-                .getAppender("ASYNC_JSON");
-        asyncAppender.stop();
+        log.info("spring boot test message", new RuntimeException("MyException"));
+        captureAsyncLogs();
 
         String logMessage = capturedStdOut.toString();
         assertThat(logMessage).isNotEmpty();
@@ -50,12 +53,21 @@ public class SpringLoggingIntegrationTest {
         assertThat(capturedFields.get("logger_name")).isEqualTo("uk.gov.hmcts.cp.integration.SpringLoggingIntegrationTest");
         assertThat(capturedFields.get("thread_name")).isEqualTo("Test worker");
         assertThat(capturedFields.get("level")).isEqualTo("INFO");
-        assertThat(capturedFields.get("message")).isEqualTo("spring boot test message");
+        assertThat(capturedFields.get("message").toString()).contains("spring boot test messagejava.lang.RuntimeException: MyException");
+        assertThat(capturedFields.get("message").toString()).contains("at uk.gov.hmcts.cp.integration.SpringLoggingIntegrationTest");
+
     }
 
     private ByteArrayOutputStream captureStdOut() {
         final ByteArrayOutputStream capturedStdOut = new ByteArrayOutputStream();
         System.setOut(new PrintStream(capturedStdOut));
         return capturedStdOut;
+    }
+
+    private void captureAsyncLogs(){
+        AsyncAppender asyncAppender = (AsyncAppender) ((ch.qos.logback.classic.Logger) LoggerFactory
+                .getLogger("ROOT"))
+                .getAppender("ASYNC_JSON");
+        asyncAppender.stop();
     }
 }
