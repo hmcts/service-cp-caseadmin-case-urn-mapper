@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Getter
-public class AppProperties {
+public class AppPropertiesBackend {
 
     private final String backendUrl;
     private final String backendPath;
     private final String backendCjscppuid;
 
-    public AppProperties(
+    public AppPropertiesBackend(
             @Value("${case-urn-mapper.url}") final String backendUrl,
             @Value("${case-urn-mapper.path}") final String backendPath,
             @Value("${case-urn-mapper.cjscppuid}") final String backendCjscppuid) {

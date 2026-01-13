@@ -10,7 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.cp.config.AppProperties;
+import uk.gov.hmcts.cp.config.AppPropertiesBackend;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 class CaseUrnMapperClientTest {
 
     @Mock
-    AppProperties appProperties;
+    AppPropertiesBackend appProperties;
     @Mock
     private RestTemplate restTemplate;
 

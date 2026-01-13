@@ -1,7 +1,6 @@
 package uk.gov.hmcts.cp.integration;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,9 +14,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.cp.client.UrnMapperResponse;
-import uk.gov.hmcts.cp.config.AppProperties;
-
-import java.io.IOException;
+import uk.gov.hmcts.cp.config.AppPropertiesBackend;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -35,7 +32,7 @@ import static uk.gov.hmcts.cp.client.CaseUrnMapperClient.CJSCPPUID_HEADER;
 class CaseUrnMapperControllerIntegrationTest {
 
     @Autowired
-    AppProperties appProperties;
+    AppPropertiesBackend appProperties;
 
     @Autowired
     private MockMvc mockMvc;
