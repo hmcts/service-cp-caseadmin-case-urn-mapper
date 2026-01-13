@@ -2,6 +2,7 @@ package uk.gov.hmcts.cp.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
     public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn(final String caseUrn, final Boolean refreshBoolean) {
         final boolean refresh = Boolean.TRUE.equals(refreshBoolean);
         final CaseMapperResponse response = caseUrnMapperService.getCaseIdByCaseUrn(validateCaseUrn(caseUrn), refresh);
-        log.debug("Mapped caseUrn:{} to caseId:{}", response.getCaseUrn(), response.getCaseId());
+        log.info("Mapped caseUrn:{} to caseId:{}", response.getCaseUrn(), response.getCaseId());
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(response);
@@ -32,7 +33,7 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
 
     private String validateCaseUrn(final String caseUrn) {
         if (caseUrn == null || !caseUrn.matches(CASE_URN_REGEX)) {
-            log.info("CaseUrn {} does not match expected caseRegex:{}", caseUrn, CASE_URN_REGEX);
+            log.info("CaseUrn {} does not match expected caseRegex:{}", Encode.forJava(caseUrn), CASE_URN_REGEX);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Case urn must be between 10 and 40 alphanumerics");
         }
         return caseUrn;

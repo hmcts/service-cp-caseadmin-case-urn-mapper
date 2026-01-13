@@ -25,8 +25,8 @@ class CaseUrnMapperClientTest {
     private final String url = "http://mock-server";
     private final String path = "/system-id-mapper-api/rest/systemid/mappings";
     private final String cjscppuid = "mock-cjscppuid";
-    private final String sourceId = "SOURCE_ID_123";
-    private final String expectedUrl = String.format("%s%s?sourceId=SOURCE_ID_123&targetType=CASE_FILE_ID", url, path);
+    private final String sourceId = "SOURCE1234";
+    private final String expectedUrl = String.format("%s%s?sourceId=SOURCE1234&targetType=CASE_FILE_ID", url, path);
 
     @BeforeEach
     void beforeEach() {
