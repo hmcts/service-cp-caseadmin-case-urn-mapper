@@ -1,222 +1,149 @@
 package uk.gov.hmcts.cp.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.cp.openapi.model.CaseMapperResponse;
-import uk.gov.hmcts.cp.utils.EncodeDecodeUtils;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.cp.client.UrnMapperResponse;
 
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.cp.client.CaseUrnMapperClient.CJSCPPUID_HEADER;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, properties = {
-        "case-urn-mapper.url=https://ENTER_CORRECT_DOMAIN.org.uk",
-        "case-urn-mapper.path=/ENTER/CORRECT/PATH",
-        "case-urn-mapper.cjscppuid=ENTER-CORRECT-CJSCPPUID"
-})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
+@Slf4j
 class CaseUrnMapperControllerIntegrationTest {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    @Value("${case-urn-mapper.url}")
+    String backendRootUrl;
+    @Value("${case-urn-mapper.path}")
+    String backendPath;
+    @Value("${case-urn-mapper.cjscppuid}")
+    String cjscppuid;
 
     @Autowired
     private MockMvc mockMvc;
+    @MockitoBean
+    RestTemplate restTemplate;
 
-    //    @Test
-    void shouldReturnOkWhenValidUrnIsProvided() throws Exception {
-        final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/urnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
+    private String caseUrn = "CIK2JQKECS";
+    private String caseId = "f552dee6-f092-415b-839c-5e5b5f46635e";
+
+    @Test
+    void refresh_false_should_return_ok() throws Exception {
+        UrnMapperResponse response = UrnMapperResponse.builder().sourceId(caseUrn).targetId(caseId).build();
+        mockRestResponse(HttpStatus.OK, response);
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn))
+                .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    CaseMapperResponse caseMapperResponse = objectMapper.readValue(responseBody, CaseMapperResponse.class);
-
-                    assertEquals(caseUrn, caseMapperResponse.getCaseUrn());
-                    assertNotNull(caseMapperResponse.getCaseId());
-                    assertEquals("f552dee6-f092-415b-839c-5e5b5f46635e", caseMapperResponse.getCaseId());
-                });
+                .andExpect(jsonPath("$.caseUrn").value(caseUrn))
+                .andExpect(jsonPath("$.caseId").value(caseId));
     }
 
-    //    @Test
-    void shouldReturnOkWhenValidUrnIsProvidedAndRefreshTrue() throws Exception {
-        final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", caseUrn).accept(MediaType.APPLICATION_JSON))
+    @Test
+    void refresh_true_should_return_ok() throws Exception {
+        UrnMapperResponse response = UrnMapperResponse.builder().sourceId(caseUrn).targetId(caseId).build();
+        mockRestResponse(HttpStatus.OK, response);
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", caseUrn))
+                .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    CaseMapperResponse caseMapperResponse = objectMapper.readValue(responseBody, CaseMapperResponse.class);
-
-                    assertEquals(caseUrn, caseMapperResponse.getCaseUrn());
-                    assertNotNull(caseMapperResponse.getCaseId());
-                    assertEquals("f552dee6-f092-415b-839c-5e5b5f46635e", caseMapperResponse.getCaseId());
-                });
+                .andExpect(jsonPath("$.caseUrn").value(caseUrn))
+                .andExpect(jsonPath("$.caseId").value(caseId));
     }
 
-    //    @Test
-    void shouldReturnOkWhenValidUrnIsProvidedAndRefreshOne() throws Exception {
-        final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=1", caseUrn).accept(MediaType.APPLICATION_JSON))
+    @Test
+    void refresh_false_should_return_cached_value() throws Exception {
+        UrnMapperResponse response1 = UrnMapperResponse.builder().sourceId(caseUrn).targetId(caseId).build();
+        mockRestResponse(HttpStatus.OK, response1);
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn))
+                .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    CaseMapperResponse caseMapperResponse = objectMapper.readValue(responseBody, CaseMapperResponse.class);
+                .andExpect(jsonPath("$.caseUrn").value(caseUrn))
+                .andExpect(jsonPath("$.caseId").value(caseId));
 
-                    assertEquals(caseUrn, caseMapperResponse.getCaseUrn());
-                    assertNotNull(caseMapperResponse.getCaseId());
-                    assertEquals("f552dee6-f092-415b-839c-5e5b5f46635e", caseMapperResponse.getCaseId());
-                });
+        UrnMapperResponse response2 = UrnMapperResponse.builder().sourceId(caseUrn).targetId("ANOTHER").build();
+        mockRestResponse(HttpStatus.OK, response2);
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.caseUrn").value(caseUrn))
+                .andExpect(jsonPath("$.caseId").value(caseId));
     }
 
-    //    @Test
-    void shouldReturnOkWhenValidUrnIsProvidedAndRefreshFalse() throws Exception {
-        final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn).accept(MediaType.APPLICATION_JSON))
+    @Test
+    void refresh_true_should_return_new_value() throws Exception {
+        UrnMapperResponse response1 = UrnMapperResponse.builder().sourceId("DAAA123123").targetId("ORIG").build();
+        mockRestResponse(HttpStatus.OK, response1);
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", "DAAA123123"))
+                .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    CaseMapperResponse caseMapperResponse = objectMapper.readValue(responseBody, CaseMapperResponse.class);
+                .andExpect(jsonPath("$.caseUrn").value("DAAA123123"))
+                .andExpect(jsonPath("$.caseId").value("ORIG"));
 
-                    assertEquals(caseUrn, caseMapperResponse.getCaseUrn());
-                    assertNotNull(caseMapperResponse.getCaseId());
-                    assertEquals("f552dee6-f092-415b-839c-5e5b5f46635e", caseMapperResponse.getCaseId());
-                });
+        UrnMapperResponse response2 = UrnMapperResponse.builder().sourceId("DAAA123123").targetId("CHANGED").build();
+        mockRestResponse(HttpStatus.OK, response2);
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", "DAAA123123"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.caseUrn").value("DAAA123123"))
+                .andExpect(jsonPath("$.caseId").value("CHANGED"));
     }
 
-    //    @Test
-    void shouldReturnOkWhenValidUrnIsProvidedAndRefreshZero() throws Exception {
-        final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=0", caseUrn).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    CaseMapperResponse caseMapperResponse = objectMapper.readValue(responseBody, CaseMapperResponse.class);
-
-                    assertEquals(caseUrn, caseMapperResponse.getCaseUrn());
-                    assertNotNull(caseMapperResponse.getCaseId());
-                    assertEquals("f552dee6-f092-415b-839c-5e5b5f46635e", caseMapperResponse.getCaseId());
-                });
-    }
-
-    //    @Test
-    void shouldReturnOkWhenValidUrnIsProvidedAndRefreshMissing() throws Exception {
-        final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/urnmapper/{case_urn}?refresh", caseUrn).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    CaseMapperResponse caseMapperResponse = objectMapper.readValue(responseBody, CaseMapperResponse.class);
-
-                    assertEquals(caseUrn, caseMapperResponse.getCaseUrn());
-                    assertNotNull(caseMapperResponse.getCaseId());
-                    assertEquals("f552dee6-f092-415b-839c-5e5b5f46635e", caseMapperResponse.getCaseId());
-                });
-    }
-
-    //    @Test
-    void shouldReturnOkWhenValidUrnIsProvidedAndRefreshMissingWithEquality() throws Exception {
-        final String caseUrn = "CIK2JQKECS";
-        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=", caseUrn).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    CaseMapperResponse caseMapperResponse = objectMapper.readValue(responseBody, CaseMapperResponse.class);
-
-                    assertEquals(caseUrn, caseMapperResponse.getCaseUrn());
-                    assertNotNull(caseMapperResponse.getCaseId());
-                    assertEquals("f552dee6-f092-415b-839c-5e5b5f46635e", caseMapperResponse.getCaseId());
-                });
-    }
-
-    //    @Test
-    void shouldRefreshResponse() throws Exception {
-        AtomicReference<CaseMapperResponse> caseMapperResponse = new AtomicReference<>();
-
-        final String caseUrn = "CIK2JQKECS";
-
-        // perform mapping search, value should be cached
-        mockMvc.perform(get("/urnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    caseMapperResponse.set(objectMapper.readValue(responseBody, CaseMapperResponse.class));
-
-                    CaseMapperResponse response = caseMapperResponse.get();
-                    assertEquals(caseUrn, response.getCaseUrn());
-                    assertNotNull(response.getCaseId());
-                    assertEquals("f552dee6-f092-415b-839c-5e5b5f46635e", response.getCaseId());
-                });
-
-        // perform mapping search again, same value should be returned
-        mockMvc.perform(get("/urnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    CaseMapperResponse response = objectMapper.readValue(responseBody, CaseMapperResponse.class);
-                    assertEquals(caseMapperResponse.get(), response);
-                });
-
-        // perform mapping search again, same value should be returned
-        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    CaseMapperResponse response = objectMapper.readValue(responseBody, CaseMapperResponse.class);
-                    assertEquals(caseMapperResponse.get(), response);
-                });
-
-        // perform mapping search again, same value should be returned
-        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=0", caseUrn).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    CaseMapperResponse response = objectMapper.readValue(responseBody, CaseMapperResponse.class);
-                    assertEquals(caseMapperResponse.get(), response);
-                });
-
-        // perform mapping search again, a new value should be generated, cached and returned
-        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", caseUrn).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    CaseMapperResponse response = objectMapper.readValue(responseBody, CaseMapperResponse.class);
-                    assertEquals(caseMapperResponse.get(), response);
-                    assertEquals(caseMapperResponse.get().getCaseUrn(), response.getCaseUrn());
-                    assertEquals(caseMapperResponse.get().getCaseId(), response.getCaseId());
-                    caseMapperResponse.set(response);
-                });
-
-        // perform mapping search again, same value should be returned as previously changed
-        mockMvc.perform(get("/urnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    CaseMapperResponse response = objectMapper.readValue(responseBody, CaseMapperResponse.class);
-                    assertEquals(caseMapperResponse.get(), response);
-                });
-    }
-
-    //    @Test
-    void shouldReturnNotFound() throws Exception {
-        final String caseUrn = EncodeDecodeUtils.encode("<script>ZXCqwe123£$^&*()[]{}.,'|`~<script>");
-        assertEquals("%3Cscript%3EZXCqwe123%C2%A3%24%5E%26*%28%29%5B%5D%7B%7D.%2C%27%7C%60%7E%3Cscript%3E", caseUrn);
-
-        mockMvc.perform(get("/urnmapper/{case_urn}", caseUrn).accept(MediaType.APPLICATION_JSON))
+    @Test
+    void not_exist_should_throw_404() throws Exception {
+        UrnMapperResponse response = UrnMapperResponse.builder().sourceId(caseUrn).build();
+        mockRestResponse(HttpStatus.NOT_FOUND, response);
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", caseUrn))
+                .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    Map body = objectMapper.readValue(responseBody, Map.class);
-                    assertEquals("404", body.get("error"));
-                    assertTrue(((String) body.get("message")).startsWith("Case not found by urn: " + caseUrn));
-                });
+                .andExpect(jsonPath("$.message").value("404 NOT_FOUND"));
     }
 
+    @Test
+    void certificate_error_should_return_500() throws Exception {
+        when(restTemplate.exchange(
+                anyString(),
+                eq(HttpMethod.GET),
+                eq(expectedRequest()),
+                eq(UrnMapperResponse.class)
+        )).thenThrow(new RuntimeException("SSL certificate problem: unable to get local issuer certificate"));
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", caseUrn))
+                .andDo(print())
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath("$.message").value("SSL certificate problem: unable to get local issuer certificate"));
+    }
+
+    private void mockRestResponse(HttpStatus httpStatus, UrnMapperResponse urnMapperResponse) {
+        String expectedUrl = String.format("%s%s?sourceId=%s&targetType=CASE_FILE_ID", backendRootUrl, backendPath, urnMapperResponse.getSourceId());
+        log.info("Mocking {}", expectedUrl);
+        when(restTemplate.exchange(
+                eq(expectedUrl),
+                eq(HttpMethod.GET),
+                eq(expectedRequest()),
+                eq(UrnMapperResponse.class)
+        )).thenReturn(new ResponseEntity<>(urnMapperResponse, httpStatus));
+    }
+
+    private HttpEntity expectedRequest() {
+        final HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.ACCEPT, "application/vnd.systemid.mapping+json");
+        headers.add(CJSCPPUID_HEADER, cjscppuid);
+        return new HttpEntity<>(headers);
+    }
 }

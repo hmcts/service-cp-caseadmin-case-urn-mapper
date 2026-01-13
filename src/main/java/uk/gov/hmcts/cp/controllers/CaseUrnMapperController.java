@@ -17,27 +17,25 @@ import uk.gov.hmcts.cp.services.CaseUrnMapperService;
 @RequiredArgsConstructor
 public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
 
+    private static final String CASE_URN_REGEX = "^[0-9a-zA-Z]{10,40}$";
     private final CaseUrnMapperService caseUrnMapperService;
+    private CaseMapperResponse response;
 
     @Override
-    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn(final String caseUrn, final Boolean refresh) {
-        try {
-            final String sanitizedCaseUrn = sanitizeCaseUrn(caseUrn);
-            final CaseMapperResponse caseMapperResponse = caseUrnMapperService.getCaseIdByCaseUrn(sanitizedCaseUrn, false);
-            log.debug("Found case ID for caseUrn: {}", sanitizedCaseUrn);
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(caseMapperResponse);
-        } catch (ResponseStatusException e) {
-            log.error(e.getMessage());
-            throw e;
-        }
+    public ResponseEntity<CaseMapperResponse> getCaseIdByCaseUrn(final String caseUrn, final Boolean refreshBoolean) {
+        final boolean refresh = Boolean.TRUE.equals(refreshBoolean);
+        final CaseMapperResponse response = caseUrnMapperService.getCaseIdByCaseUrn(validateCaseUrn(caseUrn), refresh);
+        log.info("Mapped caseUrn:{} to caseId:{}", response.getCaseUrn(), response.getCaseId());
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
     }
 
-    private String sanitizeCaseUrn(final String urn) {
-        if (urn == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "caseUrn is required");
+    private String validateCaseUrn(final String caseUrn) {
+        if (caseUrn == null || !caseUrn.matches(CASE_URN_REGEX)) {
+            log.info("CaseUrn {} does not match expected caseRegex:{}", Encode.forJava(caseUrn), CASE_URN_REGEX);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Case urn must be between 10 and 40 alphanumerics");
         }
-        return Encode.forJava(urn);
+        return caseUrn;
     }
 }

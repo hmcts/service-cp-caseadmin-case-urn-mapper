@@ -6,15 +6,12 @@ import org.owasp.encoder.Encode;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.cp.client.CaseUrnMapperClient;
+import uk.gov.hmcts.cp.client.UrnMapperResponse;
 import uk.gov.hmcts.cp.config.CachingConfig;
 import uk.gov.hmcts.cp.openapi.model.CaseMapperResponse;
-
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -32,7 +29,7 @@ public class CaseUrnCacheService {
         return getCaseIdByCaseUrnFresh(caseUrn);
     }
 
-    public CaseMapperResponse getCachedCaseIdAndRefreshCache(final String caseUrn) {
+    public CaseMapperResponse getCaseIdAndRefreshCache(final String caseUrn) {
         final CaseMapperResponse caseMapperResponse = getCaseIdByCaseUrnFresh(caseUrn);
         final Cache cache = cacheManager.getCache(CachingConfig.CASE_ID_BY_CASE_URN);
 
@@ -45,28 +42,10 @@ public class CaseUrnCacheService {
 
     private CaseMapperResponse getCaseIdByCaseUrnFresh(final String caseUrn) {
         final String unescapedCaseUrn = Encode.forJava(caseUrn);
-        final ResponseEntity<Object> responseEntity =
-                caseUrnMapperClient.getCaseFileByCaseUrn(unescapedCaseUrn);
-
-        if (responseEntity != null && responseEntity.getStatusCode().is2xxSuccessful()) {
-
-            final Object body = responseEntity.getBody();
-            if (body instanceof Map<?, ?> mapBody) {
-                if (mapBody.containsKey(SOURCE_ID) && mapBody.containsKey(TARGET_ID)) {
-                    final String sourceId = (String) mapBody.get(SOURCE_ID);
-                    final String targetId = (String) mapBody.get(TARGET_ID);
-
-                    return CaseMapperResponse.builder()
-                            .caseUrn(sourceId)
-                            .caseId(targetId)
-                            .build();
-                }
-            }
-        }
-
-        throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "Case not found by urn: " + unescapedCaseUrn
-        );
+        final ResponseEntity<UrnMapperResponse> responseEntity = caseUrnMapperClient.getCaseFileByCaseUrn(unescapedCaseUrn);
+        return CaseMapperResponse.builder()
+                .caseUrn(responseEntity.getBody().getSourceId())
+                .caseId(responseEntity.getBody().getTargetId())
+                .build();
     }
 }
