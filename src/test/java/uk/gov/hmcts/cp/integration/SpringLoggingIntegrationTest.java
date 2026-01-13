@@ -31,13 +31,6 @@ public class SpringLoggingIntegrationTest {
     }
 
     @Test
-    void simple_logging_test(){
-        log.info("First Simple log message APPEARS");
-        log.info("Second Log message with exception DOES NOT APPEAR", new RuntimeException("Colin Exception"));
-        log.info("Third Simple log message APPEARS");
-    }
-
-    @Test
     void springboot_test_should_log_correct_fields_including_exception() throws IOException {
         MDC.put("any-mdc-field", "1234-1234");
         ByteArrayOutputStream capturedStdOut = captureStdOut();
