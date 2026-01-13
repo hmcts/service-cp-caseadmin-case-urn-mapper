@@ -36,7 +36,7 @@ azure:
     instrumentation-key: ${rpe.AppInsightsInstrumentationKey:00000000-0000-0000-0000-000000000000}
 
 case-urn-mapper:
-  url: ${CP_BACKEND_URL_XXX:http://localhost}
+  url: ${CP_BACKEND_URL:http://localhost}
   path: /system-id-mapper-api/rest/systemid/mappings
   cjscppuid: ${CJSCPPUID:00000000-0000-0000-0000-000000000000}
 
