@@ -45,12 +45,6 @@ class CaseUrnMapperControllerIntegrationTest {
     private String caseUrn = "CIK2JQKECS";
     private String caseId = "f552dee6-f092-415b-839c-5e5b5f46635e";
 
-    @BeforeEach
-    void vars_should_be_set_from_app_properties() throws IOException {
-        log.info("COLING debug backendRootUrl:{}", appProperties.getBackendUrl());
-        assertThat(appProperties.getBackendUrl()).isNotEmpty();
-    }
-
     @Test
     void refresh_false_should_return_ok() throws Exception {
         UrnMapperResponse response = UrnMapperResponse.builder().sourceId(caseUrn).targetId(caseId).build();
