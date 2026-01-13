@@ -1,6 +1,7 @@
 package uk.gov.hmcts.cp.integration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.cp.client.UrnMapperResponse;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -44,6 +51,15 @@ class CaseUrnMapperControllerIntegrationTest {
 
     private String caseUrn = "CIK2JQKECS";
     private String caseId = "f552dee6-f092-415b-839c-5e5b5f46635e";
+
+    @BeforeEach
+    void vars_should_be_set_from_app_properties() throws IOException {
+        log.info("COLING debug backendRootUrl:{}", backendRootUrl);
+        log.info("COLING debug cjscppuid:{}", cjscppuid);
+        List<String> appInfo = Files.readAllLines(Path.of("./src/main/resources/application.yaml"));
+        log.info("COLING app.yaml:{}", appInfo);
+        assertThat(backendRootUrl).isNotEmpty();
+    }
 
     @Test
     void refresh_false_should_return_ok() throws Exception {
