@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.gov.hmcts.cp.config.AppProperties;
+import uk.gov.hmcts.cp.config.AppPropertiesBackend;
 
 @Slf4j
 @Component
@@ -19,7 +19,7 @@ import uk.gov.hmcts.cp.config.AppProperties;
 public class CaseUrnMapperClient {
     public static final String CJSCPPUID_HEADER = "CJSCPPUID";
 
-    private final AppProperties appProperties;
+    private final AppPropertiesBackend appProperties;
     private final RestTemplate restTemplate;
 
     protected String buildCaseUrnMapperUrl(final String sourceId) {
