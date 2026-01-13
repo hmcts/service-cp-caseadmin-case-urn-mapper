@@ -1,35 +1,20 @@
-version: '3.8'
-
 services:
-  service-cp-caseadmin-case-urn-mapper:
-    env_file:
-      - .env
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-        no_proxy: ${no_proxy}
-        BASE_IMAGE: ${BASE_IMAGE}
-        SERVER_PORT: ${SERVER_PORT}
-        JAR_FILENAME: ${JAR_FILENAME}
-        JAR_FILE_PATH: ${JAR_FILE_PATH}
-        CP_BACKEND_URL: ${CP_BACKEND_URL}
-        CJSCPPUID: ${CJSCPPUID}
-    environment:
-      - SERVER_PORT=${SERVER_PORT:-4550}
+  wiremock:
+    image: wiremock/wiremock:3.6.0
     ports:
-      - "${SERVER_PORT:-4550}:${SERVER_PORT:-4550}"
-    networks:
-      - service-network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:${SERVER_PORT}/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 5s
+      - "8080:8080"
+    volumes:
+      - ./src/apiTest/resources/mappings:/home/wiremock/mappings
+      - ./src/apiTest/resources/__files:/home/wiremock/__files
+    command:
+      - "--global-response-templating"
+      - "--verbose"
 
-networks:
-  service-network:
-    name: service-cp-caseadmin-case-urn-mapper-network
+  app:
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "4550:4550"
+    environment:
+      CP_BACKEND_URL: "http://wiremock:8080"
+
