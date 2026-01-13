@@ -53,7 +53,7 @@ public class SpringLoggingIntegrationTest {
         assertThat(capturedFields.get("logger_name")).isEqualTo("uk.gov.hmcts.cp.integration.SpringLoggingIntegrationTest");
         assertThat(capturedFields.get("thread_name")).isEqualTo("Test worker");
         assertThat(capturedFields.get("level")).isEqualTo("INFO");
-        assertThat(capturedFields.get("message").toString()).contains("spring boot test messagejava.lang.RuntimeException: MyException");
+        assertThat(capturedFields.get("message").toString()).contains("spring boot test message\njava.lang.RuntimeException: MyException");
         assertThat(capturedFields.get("message").toString()).contains("at uk.gov.hmcts.cp.integration.SpringLoggingIntegrationTest");
 
     }
