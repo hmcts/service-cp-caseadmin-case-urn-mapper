@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpEntity;
@@ -16,11 +15,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.cp.client.UrnMapperResponse;
+import uk.gov.hmcts.cp.config.AppProperties;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -37,12 +34,8 @@ import static uk.gov.hmcts.cp.client.CaseUrnMapperClient.CJSCPPUID_HEADER;
 @Slf4j
 class CaseUrnMapperControllerIntegrationTest {
 
-    @Value("${case-urn-mapper.url}")
-    String backendRootUrl;
-    @Value("${case-urn-mapper.path}")
-    String backendPath;
-    @Value("${case-urn-mapper.cjscppuid}")
-    String cjscppuid;
+    @Autowired
+    AppProperties appProperties;
 
     @Autowired
     private MockMvc mockMvc;
@@ -54,11 +47,8 @@ class CaseUrnMapperControllerIntegrationTest {
 
     @BeforeEach
     void vars_should_be_set_from_app_properties() throws IOException {
-        log.info("COLING debug backendRootUrl:{}", backendRootUrl);
-        log.info("COLING debug cjscppuid:{}", cjscppuid);
-        List<String> appInfo = Files.readAllLines(Path.of("./src/main/resources/application.yaml"));
-        log.info("COLING app.yaml:{}", appInfo);
-        assertThat(backendRootUrl).isNotEmpty();
+        log.info("COLING debug backendRootUrl:{}", appProperties.getBackendUrl());
+        assertThat(appProperties.getBackendUrl()).isNotEmpty();
     }
 
     @Test
@@ -146,7 +136,7 @@ class CaseUrnMapperControllerIntegrationTest {
     }
 
     private void mockRestResponse(HttpStatus httpStatus, UrnMapperResponse urnMapperResponse) {
-        String expectedUrl = String.format("%s%s?sourceId=%s&targetType=CASE_FILE_ID", backendRootUrl, backendPath, urnMapperResponse.getSourceId());
+        String expectedUrl = String.format("%s%s?sourceId=%s&targetType=CASE_FILE_ID", appProperties.getBackendUrl(), appProperties.getBackendPath(), urnMapperResponse.getSourceId());
         log.info("Mocking {}", expectedUrl);
         when(restTemplate.exchange(
                 eq(expectedUrl),
@@ -159,7 +149,7 @@ class CaseUrnMapperControllerIntegrationTest {
     private HttpEntity expectedRequest() {
         final HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.ACCEPT, "application/vnd.systemid.mapping+json");
-        headers.add(CJSCPPUID_HEADER, cjscppuid);
+        headers.add(CJSCPPUID_HEADER, appProperties.getBackendCjscppuid());
         return new HttpEntity<>(headers);
     }
 }

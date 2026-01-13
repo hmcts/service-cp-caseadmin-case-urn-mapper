@@ -1,8 +1,8 @@
 package uk.gov.hmcts.cp.client;
 
 import io.micrometer.common.util.StringUtils;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,27 +11,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.hmcts.cp.config.AppProperties;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class CaseUrnMapperClient {
-
     public static final String CJSCPPUID_HEADER = "CJSCPPUID";
 
+    private final AppProperties appProperties;
     private final RestTemplate restTemplate;
-    private final String cpBackendUrl;
-    private final String caseUrnMapperPath;
-    private final String cjscppuid;
-
-    public CaseUrnMapperClient(final RestTemplate restTemplate,
-                               @Value("${case-urn-mapper.url}") final String cpBackendUrl,
-                               @Value("${case-urn-mapper.path}") final String caseUrnMapperPath,
-                               @Value("${case-urn-mapper.cjscppuid}") final String cjscppuid) {
-        this.restTemplate = restTemplate;
-        this.cpBackendUrl = cpBackendUrl;
-        this.caseUrnMapperPath = caseUrnMapperPath;
-        this.cjscppuid = cjscppuid;
-    }
 
     protected String buildCaseUrnMapperUrl(final String sourceId) {
         return UriComponentsBuilder
@@ -70,8 +59,8 @@ public class CaseUrnMapperClient {
 
     public String getCpBackendUrl() {
         final String value;
-        if (StringUtils.isNotBlank(cpBackendUrl)) {
-            value = cpBackendUrl;
+        if (StringUtils.isNotBlank(appProperties.getBackendUrl())) {
+            value = appProperties.getBackendUrl();
         } else {
             log.error("cpBackendUrl is null or empty");
             value = null;
@@ -81,8 +70,8 @@ public class CaseUrnMapperClient {
 
     public String getCaseUrnMapperPath() {
         final String value;
-        if (StringUtils.isNotBlank(caseUrnMapperPath)) {
-            value = caseUrnMapperPath;
+        if (StringUtils.isNotBlank(appProperties.getBackendPath())) {
+            value = appProperties.getBackendPath();
         } else {
             log.error("caseUrnMapperPath is null or empty");
             value = null;
@@ -92,8 +81,8 @@ public class CaseUrnMapperClient {
 
     public String getCjscppuid() {
         final String value;
-        if (StringUtils.isNotBlank(cjscppuid)) {
-            value = cjscppuid;
+        if (StringUtils.isNotBlank(appProperties.getBackendCjscppuid())) {
+            value = appProperties.getBackendCjscppuid();
         } else {
             log.error("cjscppuid is null or empty");
             value = null;
