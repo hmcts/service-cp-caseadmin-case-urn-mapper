@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 @Getter
 public class AppProperties {
 
-    private String backendUrl;
-    private String backendPath;
-    private String backendCjscppuid;
+    private final String backendUrl;
+    private final String backendPath;
+    private final String backendCjscppuid;
 
     public AppProperties(
-            @Value("${case-urn-mapper.url}") String backendUrl,
-            @Value("${case-urn-mapper.path}") String backendPath,
-            @Value("${case-urn-mapper.cjscppuid}") String backendCjscppuid) {
+            @Value("${case-urn-mapper.url}") final String backendUrl,
+            @Value("${case-urn-mapper.path}") final String backendPath,
+            @Value("${case-urn-mapper.cjscppuid}") final String backendCjscppuid) {
         this.backendUrl = backendUrl;
         this.backendPath = backendPath;
         this.backendCjscppuid = backendCjscppuid;
