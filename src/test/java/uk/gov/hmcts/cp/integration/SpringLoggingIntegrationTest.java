@@ -1,14 +1,15 @@
 package uk.gov.hmcts.cp.integration;
 
+import ch.qos.logback.classic.AsyncAppender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,10 +31,11 @@ public class SpringLoggingIntegrationTest {
     }
 
     @Test
-    void springboot_test_should_log_correct_fields() throws IOException {
+    void springboot_test_should_log_correct_fields_including_exception() throws IOException {
         MDC.put("any-mdc-field", "1234-1234");
         ByteArrayOutputStream capturedStdOut = captureStdOut();
-        log.info("spring boot test message");
+        log.info("spring boot test message", new RuntimeException("MyException"));
+        captureAsyncLogs();
 
         String logMessage = capturedStdOut.toString();
         assertThat(logMessage).isNotEmpty();
@@ -44,12 +46,21 @@ public class SpringLoggingIntegrationTest {
         assertThat(capturedFields.get("logger_name")).isEqualTo("uk.gov.hmcts.cp.integration.SpringLoggingIntegrationTest");
         assertThat(capturedFields.get("thread_name")).isEqualTo("Test worker");
         assertThat(capturedFields.get("level")).isEqualTo("INFO");
-        assertThat(capturedFields.get("message")).isEqualTo("spring boot test message");
+        assertThat(capturedFields.get("message").toString()).contains("spring boot test message\njava.lang.RuntimeException: MyException");
+        assertThat(capturedFields.get("message").toString()).contains("at uk.gov.hmcts.cp.integration.SpringLoggingIntegrationTest");
+
     }
 
     private ByteArrayOutputStream captureStdOut() {
         final ByteArrayOutputStream capturedStdOut = new ByteArrayOutputStream();
         System.setOut(new PrintStream(capturedStdOut));
         return capturedStdOut;
+    }
+
+    private void captureAsyncLogs(){
+        AsyncAppender asyncAppender = (AsyncAppender) ((ch.qos.logback.classic.Logger) LoggerFactory
+                .getLogger("ROOT"))
+                .getAppender("ASYNC_JSON");
+        asyncAppender.stop();
     }
 }
