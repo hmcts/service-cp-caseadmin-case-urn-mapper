@@ -33,7 +33,7 @@ ext {
 
 dependencies {
   implementation "uk.gov.hmcts.cp:api-cp-caseadmin-case-urn-mapper:$apiCaseUrnMapperVersion"
-  implementation "io.swagger.core.v3:swagger-annotations:2.2.41"
+  implementation "io.swagger.core.v3:swagger-annotations:2.2.42"
 
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'org.hibernate.validator:hibernate-validator'
