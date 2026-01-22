@@ -27,7 +27,7 @@ public class CaseUrnMapperService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "caseUrn is required");
         }
         final CaseMapperResponse caseMapperResponse = caseUrnMapperRepository.getCaseIdByCaseUrn(caseUrn, refresh);
-        log.debug("Case Mapper response: {}", caseMapperResponse);
+        log.info("Case Mapper response: {}", caseMapperResponse);
         return caseMapperResponse;
     }
 
