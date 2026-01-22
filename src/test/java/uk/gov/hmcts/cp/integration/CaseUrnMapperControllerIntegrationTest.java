@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.cp.client.UrnMapperResponse;
 import uk.gov.hmcts.cp.config.AppPropertiesBackend;
@@ -37,18 +36,17 @@ class CaseUrnMapperControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @MockitoBean
     RestTemplate restTemplate;
 
     private String caseUrn = "CIK2JQKECS";
     private String caseId = "f552dee6-f092-415b-839c-5e5b5f46635e";
-    private String caseIdChanged = "a123dee6-f092-415b-839c-5e5b5f45566a";
-
 
     @Test
     void refresh_false_should_return_ok() throws Exception {
         UrnMapperResponse response = UrnMapperResponse.builder().sourceId(caseUrn).targetId(caseId).build();
-        mockRestResponse(caseUrn, HttpStatus.OK, response);
+        mockRestResponse(HttpStatus.OK, response);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -59,7 +57,7 @@ class CaseUrnMapperControllerIntegrationTest {
     @Test
     void refresh_true_should_return_ok() throws Exception {
         UrnMapperResponse response = UrnMapperResponse.builder().sourceId(caseUrn).targetId(caseId).build();
-        mockRestResponse(caseUrn, HttpStatus.OK, response);
+        mockRestResponse(HttpStatus.OK, response);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", caseUrn))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -70,7 +68,7 @@ class CaseUrnMapperControllerIntegrationTest {
     @Test
     void refresh_false_should_return_cached_value() throws Exception {
         UrnMapperResponse response1 = UrnMapperResponse.builder().sourceId(caseUrn).targetId(caseId).build();
-        mockRestResponse(caseUrn, HttpStatus.OK, response1);
+        mockRestResponse(HttpStatus.OK, response1);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -78,7 +76,7 @@ class CaseUrnMapperControllerIntegrationTest {
                 .andExpect(jsonPath("$.caseId").value(caseId));
 
         UrnMapperResponse response2 = UrnMapperResponse.builder().sourceId(caseUrn).targetId("ANOTHER").build();
-        mockRestResponse(caseUrn, HttpStatus.OK, response2);
+        mockRestResponse(HttpStatus.OK, response2);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -89,7 +87,7 @@ class CaseUrnMapperControllerIntegrationTest {
     @Test
     void refresh_true_should_return_new_value() throws Exception {
         UrnMapperResponse response1 = UrnMapperResponse.builder().sourceId("DAAA123123").targetId("ORIG").build();
-        mockRestResponse("DAAA123123", HttpStatus.OK, response1);
+        mockRestResponse(HttpStatus.OK, response1);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", "DAAA123123"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -97,7 +95,7 @@ class CaseUrnMapperControllerIntegrationTest {
                 .andExpect(jsonPath("$.caseId").value("ORIG"));
 
         UrnMapperResponse response2 = UrnMapperResponse.builder().sourceId("DAAA123123").targetId("CHANGED").build();
-        mockRestResponse("DAAA123123", HttpStatus.OK, response2);
+        mockRestResponse(HttpStatus.OK, response2);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", "DAAA123123"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -136,12 +134,8 @@ class CaseUrnMapperControllerIntegrationTest {
                 .andExpect(jsonPath("$.message").value("SSL certificate problem: unable to get local issuer certificate"));
     }
 
-    private void mockRestClientError(String sourceId, HttpStatus httpStatus) {
-
-    }
-
-    private void mockRestResponse(String sourceId, HttpStatus httpStatus, UrnMapperResponse urnMapperResponse) {
-        String expectedUrl = String.format("%s%s?sourceId=%s&targetType=CASE_FILE_ID", appProperties.getBackendUrl(), appProperties.getBackendPath(), sourceId);
+    private void mockRestResponse(HttpStatus httpStatus, UrnMapperResponse urnMapperResponse) {
+        String expectedUrl = String.format("%s%s?sourceId=%s&targetType=CASE_FILE_ID", appProperties.getBackendUrl(), appProperties.getBackendPath(), urnMapperResponse.getSourceId());
         log.info("Mocking {} response", expectedUrl);
         when(restTemplate.exchange(
                 eq(expectedUrl),
