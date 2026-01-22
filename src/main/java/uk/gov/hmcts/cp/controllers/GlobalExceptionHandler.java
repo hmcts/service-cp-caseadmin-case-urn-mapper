@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(final ResponseStatusException responseStatusException) {
         log.error("GlobalExceptionHandler handleResponseStatusException", responseStatusException);
-        String errorMessage = responseStatusException.getReason() != null
+        final String errorMessage = responseStatusException.getReason() != null
                 ? responseStatusException.getReason()
                 : responseStatusException.getMessage();
         return ResponseEntity
@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
                 .body(buildErrorResponse(e.getMessage()));
     }
 
-    private ErrorResponse buildErrorResponse(String message) {
+    private ErrorResponse buildErrorResponse(final String message) {
         return ErrorResponse.builder()
                 .message(message)
                 .timestamp(Instant.now())
