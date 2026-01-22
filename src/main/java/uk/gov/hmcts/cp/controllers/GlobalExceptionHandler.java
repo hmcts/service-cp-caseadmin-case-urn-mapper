@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.cp.openapi.model.ErrorResponse;
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(final ResponseStatusException responseStatusException) {
-        log.error("GlobalExceptionHandler handleResponseStatusException");
+        log.error("GlobalExceptionHandler handleResponseStatusException", responseStatusException);
         final ErrorResponse error = ErrorResponse.builder()
                 .error(String.valueOf(responseStatusException.getStatusCode().value()))
                 .message(responseStatusException.getReason() != null
@@ -42,7 +43,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpServerErrorException.class)
     public ResponseEntity<ErrorResponse> handleServerException(final HttpServerErrorException e) {
-        log.error("GlobalExceptionHandler handleServerException");
+        log.error("GlobalExceptionHandler handleServerException", e);
+        final ErrorResponse error = ErrorResponse.builder()
+                .message(e.getMessage())
+                .timestamp(Instant.now())
+                .traceId(Objects.requireNonNull(tracer.currentSpan()).context().traceId())
+                .build();
+        return ResponseEntity
+                .status(e.getStatusCode())
+                .body(error);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<ErrorResponse> handleClientException(final HttpClientErrorException e) {
+        log.error("GlobalExceptionHandler handleClientException", e);
         final ErrorResponse error = ErrorResponse.builder()
                 .message(e.getMessage())
                 .timestamp(Instant.now())
@@ -55,7 +69,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(final Exception e) {
-        log.error("GlobalExceptionHandler handleException");
+        log.error("GlobalExceptionHandler handleException", e);
         final ErrorResponse error = ErrorResponse.builder()
                 .message(e.getMessage())
                 .timestamp(Instant.now())

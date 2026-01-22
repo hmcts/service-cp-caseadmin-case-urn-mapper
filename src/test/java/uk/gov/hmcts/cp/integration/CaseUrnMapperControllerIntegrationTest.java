@@ -12,11 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.cp.client.UrnMapperResponse;
 import uk.gov.hmcts.cp.config.AppPropertiesBackend;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -36,6 +36,7 @@ class CaseUrnMapperControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @MockitoBean
     RestTemplate restTemplate;
 
@@ -104,8 +105,15 @@ class CaseUrnMapperControllerIntegrationTest {
 
     @Test
     void not_exist_should_throw_404() throws Exception {
-        UrnMapperResponse response = UrnMapperResponse.builder().sourceId(caseUrn).build();
-        mockRestResponse(HttpStatus.NOT_FOUND, response);
+        String expectedUrl = String.format("%s%s?sourceId=%s&targetType=CASE_FILE_ID", appProperties.getBackendUrl(), appProperties.getBackendPath(), caseUrn);
+        log.info("Mocking {} error", expectedUrl);
+        when(restTemplate.exchange(
+                eq(expectedUrl),
+                eq(HttpMethod.GET),
+                eq(expectedRequest()),
+                eq(UrnMapperResponse.class)
+        )).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", caseUrn))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -128,7 +136,7 @@ class CaseUrnMapperControllerIntegrationTest {
 
     private void mockRestResponse(HttpStatus httpStatus, UrnMapperResponse urnMapperResponse) {
         String expectedUrl = String.format("%s%s?sourceId=%s&targetType=CASE_FILE_ID", appProperties.getBackendUrl(), appProperties.getBackendPath(), urnMapperResponse.getSourceId());
-        log.info("Mocking {}", expectedUrl);
+        log.info("Mocking {} response", expectedUrl);
         when(restTemplate.exchange(
                 eq(expectedUrl),
                 eq(HttpMethod.GET),
