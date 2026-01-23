@@ -2,14 +2,10 @@ server:
   port: 4550
   shutdown: "graceful"
 
-# If you use a database then uncomment the `group:, readiness: and include: "db"` lines in the health probes and uncomment the datasource section
 management:
   endpoint:
     health:
       show-details: "always"
-      # group:
-      #  readiness:
-      #   include: "db"
   endpoints:
     web:
       # Odd to expose actuator info on root not the sensible default of /actuator/info etc
@@ -21,15 +17,14 @@ management:
     sampling:
       probability: 1.0
 
-springdoc:
-  packagesToScan: uk.gov.hmcts.cp.controllers
-  writer-with-order-by-keys: true
-
 spring:
   config:
     import: "optional:configtree:/mnt/secrets/rpe/"
   application:
     name: Spring Boot Template
+  web:
+    resources:
+      add-mappings: false     # disable serving any static resources
 
 azure:
   application-insights:
