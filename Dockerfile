@@ -1,5 +1,7 @@
-# az login; az acr login -n crmdvrepo01 to authenticate to hmcts Azure Container Registry
-FROM crmdvrepo01.azurecr.io/hmcts/apm-services:25-jre
+# azure pipeline replaces $BASE_IMAGE with crmdvrepo01.azurecr.io/hmcts/apm-services:25-jre
+# which requires az login; az acr login -n crmdvrepo01 to authenticate to hmcts Azure Container Registry
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE:-eclipse-temurin:25-jre}
 
 # run as non-root ... group and user "app"
 RUN groupadd -r app && useradd -r -g app app
