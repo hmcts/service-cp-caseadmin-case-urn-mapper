@@ -83,7 +83,7 @@ jobs:
           echo "Building with ARTEFACT_VERSION=$ARTEFACT_VERSION"
           echo "Active environment=$ENVIRONMENT"
 
-          gradle build -DARTEFACT_VERSION=$ARTEFACT_VERSION
+          ./gradlew build -DARTEFACT_VERSION=$ARTEFACT_VERSION
 
           if [ -z "AZURE_DEVOPS_ARTIFACT_USERNAME" ]; then
             echo "::warning::AZURE_DEVOPS_ARTIFACT_USERNAME is null or not set"
@@ -96,7 +96,7 @@ jobs:
           if [ "${{ inputs.is_publish }}" == "true" ]; then
             echo "Publishing artefact for version: $ARTEFACT_VERSION"
 
-            gradle publish \
+            ./gradlew publish \
               -DARTEFACT_VERSION=$ARTEFACT_VERSION \
               -DGITHUB_REPOSITORY=${{ github.repository }} \
               -DGITHUB_ACTOR=${{ github.actor }} \
