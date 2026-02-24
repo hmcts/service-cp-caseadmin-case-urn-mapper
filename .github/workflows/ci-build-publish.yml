@@ -175,4 +175,6 @@ jobs:
               "ARTIFACT_ID": "${{ env.REPO_NAME }}",
               "ARTIFACT_VERSION": "${{ needs.Artefact-Version.outputs.artefact_version }}",
               "TARGET_REPOSITORY": "${{ github.repository }}"
+              "agentDemand": "ubuntu-j25"
+              "baseImage": "hmcts/apm-services:25-jre"
             }
