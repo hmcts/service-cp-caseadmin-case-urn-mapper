@@ -1,4 +1,4 @@
-# See ci-build-publish.yml which sets baseImage=hmcts/apm-services:25-jre
+# See ci-build-publish.yml which sets baseImage=hmcts/apm-services:25-jre and agentDemand:ubuntu-j25
 # azure pipeline replaces $BASE_IMAGE with crmdvrepo01.azurecr.io + $baseImage
 # This image has the hmcts self signing certificate authority added to truststore so we dont need to worry about about the certs
 # If pulling this locally we need to authenticate to acr ... az login; az acr login -n crmdvrepo01
