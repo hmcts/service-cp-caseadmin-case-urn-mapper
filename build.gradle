@@ -42,4 +42,7 @@ dependencies {
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
   implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+  testImplementation 'org.wiremock.integrations:wiremock-spring-boot:4.1.0'
+  testImplementation 'org.wiremock:wiremock-standalone:3.13.2'
 }
