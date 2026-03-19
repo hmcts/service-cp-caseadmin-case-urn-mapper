@@ -7,11 +7,13 @@
                     <fieldName>timestamp</fieldName>
                     <pattern>yyyy-MM-dd' 'HH:mm:ss.SSS</pattern>
                 </timestamp>
+                <!-- Lets keep the message to the left so its easier to find without scrolling -->
+                <message/>
                 <loggerName/>
                 <threadName/>
                 <logLevel/>
                 <pattern>
-                    <pattern>{"message": "%message%n%xException{full}"}</pattern>
+                    <pattern>{"exception": "%xException{full}"}</pattern>
                 </pattern>
             </providers>
         </encoder>
