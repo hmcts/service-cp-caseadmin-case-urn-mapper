@@ -14,8 +14,6 @@ group = 'uk.gov.hmcts.cp'
 version = System.getProperty('ARTEFACT_VERSION') ?: '0.0.999'
 
 apply {
-  from("$rootDir/gradle/spring-core.gradle")
-
   from("$rootDir/gradle/repositories.gradle")
   from("$rootDir/gradle/java.gradle")
   from("$rootDir/gradle/dependency.gradle")
@@ -40,6 +38,7 @@ dependencies {
   implementation 'ch.qos.logback:logback-classic'
   implementation 'ch.qos.logback:logback-core'
   implementation "org.owasp.encoder:encoder:1.2.3"
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
   compileOnly group: 'org.projectlombok', name: 'lombok', version: "1.18.40"
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "1.18.40"
@@ -49,13 +48,20 @@ dependencies {
   implementation "org.mapstruct:mapstruct:1.5.5.Final"
   annotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
 
-  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  // Spring boot core
+  implementation "org.springframework.boot:spring-boot-starter-web"
+  implementation "org.springframework.boot:spring-boot-starter-aspectj"
+  implementation "org.springframework.boot:spring-boot-starter-actuator"
+  implementation "org.springframework.boot:spring-boot-starter-validation"
+
+  testImplementation "org.springframework.boot:spring-boot-starter-webmvc-test"
+  testImplementation "org.springframework.boot:spring-boot-starter-test"
+  implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+
   implementation 'org.hibernate.validator:hibernate-validator'
   implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
   implementation 'io.jsonwebtoken:jjwt:0.13.0'
-  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-  implementation 'org.springframework.boot:spring-boot-starter-cache'
 
   testImplementation 'org.wiremock.integrations:wiremock-spring-boot:4.1.0'
   testImplementation 'org.wiremock:wiremock-standalone:3.13.2'
