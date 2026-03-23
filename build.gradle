@@ -27,12 +27,8 @@ apply {
   from("$rootDir/gradle/apitest.gradle")
 }
 
-ext {
-  apiCaseUrnMapperVersion = "1.0.7"
-}
-
 dependencies {
-  implementation "uk.gov.hmcts.cp:api-cp-caseadmin-case-urn-mapper:$apiCaseUrnMapperVersion"
+  implementation "uk.gov.hmcts.cp:api-cp-caseadmin-case-urn-mapper:1.0.7"
   implementation "io.swagger.core.v3:swagger-annotations:2.2.43"
 
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
