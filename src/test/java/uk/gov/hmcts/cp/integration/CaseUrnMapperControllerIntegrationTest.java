@@ -1,12 +1,9 @@
 package uk.gov.hmcts.cp.integration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,13 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.cp.client.UrnMapperResponse;
 import uk.gov.hmcts.cp.config.AppPropertiesBackend;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static java.net.HttpURLConnection.*;
+import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,6 +34,7 @@ class CaseUrnMapperControllerIntegrationTest {
 
     @Autowired
     AppPropertiesBackend appProperties;
+
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -136,7 +137,7 @@ class CaseUrnMapperControllerIntegrationTest {
 
     @Test
     void empty_caseUrn_should_throw_404() throws Exception {
-        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", Strings.EMPTY))
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", ""))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
@@ -157,7 +158,7 @@ class CaseUrnMapperControllerIntegrationTest {
                 .andExpect(status().is5xxServerError());
     }
 
-    private void stubMappingResponse(UrnMapperResponse urnMapperResponse) throws JsonProcessingException {
+    private void stubMappingResponse(UrnMapperResponse urnMapperResponse) {
         String expectedUrl = String.format("%s?sourceId=%s&targetType=CASE_FILE_ID", appProperties.getBackendPath(), urnMapperResponse.getSourceId());
         ResponseDefinitionBuilder mockResponse = aResponse()
                 .withStatus(HTTP_OK)
