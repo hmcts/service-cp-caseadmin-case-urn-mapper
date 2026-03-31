@@ -24,11 +24,21 @@ apply {
   from("$rootDir/gradle/apitest.gradle")
 }
 
+// A dedicated configuration for API spec dependencies.
+// This allows CI to validate that the API spec version is pinned to a fixed release
+// before allowing a service release to be published. The release workflow runs a Gradle
+// task against this configuration to reject dynamic versions (ranges, SNAPSHOTs, +, etc.).
+configurations {
+  apiSpec
+}
+
 // We MUST keep all dependencies in the build.gradle to allow dependabot to provide version updates
 // Sadly, dependabot does not track dependencies in the apply-from files
 dependencies {
-  // Api spec
-  implementation "uk.gov.hmcts.cp:api-cp-caseadmin-case-urn-mapper:1.0.7"
+  // Api spec – declared in the apiSpec configuration so the release gate can verify
+  // the version is fixed, then folded into implementation so it is available at compile time.
+  apiSpec "uk.gov.hmcts.cp:api-cp-caseadmin-case-urn-mapper:1.0.7"
+  implementation configurations.apiSpec
   implementation "io.swagger.core.v3:swagger-annotations:2.2.45"
 
 
