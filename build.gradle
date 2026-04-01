@@ -22,6 +22,7 @@ apply {
   from("$rootDir/gradle/jar.gradle")
 
   from("$rootDir/gradle/apitest.gradle")
+  from("$rootDir/gradle/apispec-validation.gradle")
 }
 
 configurations {
