@@ -17,7 +17,7 @@ import uk.gov.hmcts.cp.services.CaseUrnMapperService;
 @RequiredArgsConstructor
 public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
 
-    private static final String CASE_URN_REGEX = "^[0-9a-zA-Z]{10,40}$";
+    private static final String CASE_URN_REGEX = "^[0-9a-zA-Z]{1,30}$";
     private final CaseUrnMapperService caseUrnMapperService;
     private CaseMapperResponse response;
 
@@ -34,7 +34,7 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
     private String validateCaseUrn(final String caseUrn) {
         if (caseUrn == null || !caseUrn.matches(CASE_URN_REGEX)) {
             log.info("CaseUrn {} does not match expected caseRegex:{}", Encode.forJava(caseUrn), CASE_URN_REGEX);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Case urn must be between 10 and 40 alphanumerics");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Case urn must be between 1 and 30 alphanumerics");
         }
         return caseUrn;
     }
