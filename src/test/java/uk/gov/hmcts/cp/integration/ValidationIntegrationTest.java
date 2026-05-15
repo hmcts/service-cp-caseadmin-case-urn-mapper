@@ -21,20 +21,20 @@ class ValidationIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    void short_case_urn_should_throw_400() throws Exception {
-        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", "short"))
+    void non_alphanumeric_case_urn_should_throw_400() throws Exception {
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", "short-urn"))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Case urn must be between 10 and 40 alphanumerics"));
+                .andExpect(jsonPath("$.message").value("Case urn must be between 1 and 30 alphanumerics"));
     }
 
     @Test
     void long_case_urn_should_throw_400() throws Exception {
-        String longCaseUrn = String.format("%41d", 1);
+        String longCaseUrn = "A".repeat(31);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", longCaseUrn))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Case urn must be between 10 and 40 alphanumerics"));
+                .andExpect(jsonPath("$.message").value("Case urn must be between 1 and 30 alphanumerics"));
     }
 
     @Test
