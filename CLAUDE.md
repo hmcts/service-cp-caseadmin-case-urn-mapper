@@ -55,7 +55,7 @@ uk.gov.hmcts.cp/
 - **Cache-aside pattern**: `CaseUrnCacheService` checks cache first; on miss, `CaseUrnMapperClient` calls backend and writes to cache.
 - **URN encoding**: `EncodeDecodeUtils` must be applied before passing URN to `CaseUrnMapperClient` — URNs contain slashes and colons that break URL routing.
 - **`refresh` query parameter**: When `refresh=true`, skip the cache and force a backend call; client passes this through unchanged.
-- **CJSCPPUID header**: `CaseUrnMapperClient` sets `CJSCPPUID` on every backend request. Never remove this header.
+- **CJSCPPUID header**: `CaseUrnMapperClient` sets `CJSCPPUID` on every backend request.
 
 ## Debugging
 
