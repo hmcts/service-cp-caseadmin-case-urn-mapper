@@ -44,14 +44,14 @@ ci-build-publish.yml
     ├── Build-Docker      ghcr.io/hmcts/service-cp-caseadmin-case-urn-mapper:1.2.6
     ├── Deploy            ADO pipeline 460: GHCR → ACR  tag: 1.2.6_010626
     ├── Wait-For-ACR-Push
+    ├── compute-acr-tag   computes full ACR tag "1.2.6_010626"
     │
     ├── deploy-dev        SKIPPED  (deploy_dev: false)
     │
     └── deploy-sit
-            writes cp-vp-aks-deploy / env/sit / vp-config/services_values.yml:
-              service-cp-caseadmin-case-urn-mapper.image.tag = "1.2.6_010626"
-            triggers ADO pipeline 434 (ref: env/sit)
-            → deploys to sitamp01
+            calls update-service-tag.yml in cp-vp-aks-deploy (3-attempt push retry)
+              → commits env/sit: service-cp-caseadmin-case-urn-mapper.image.tag = "1.2.6_010626"
+              → push triggers trigger-k8s-deploy.yml → ADO pipeline 434 → sitamp01
 ```
 
 ---
@@ -74,10 +74,12 @@ ci-build-publish.yml
     ├── Build-Docker      ghcr.io/...:1.2.5-d54722d
     ├── Deploy            ADO pipeline 460 → ACR  tag: 1.2.5-d54722d_290526
     ├── Wait-For-ACR-Push
+    ├── compute-acr-tag   computes full ACR tag "1.2.5-d54722d_290526"
     │
     ├── deploy-dev
-    │       writes env/dev services_values.yml: tag = "1.2.5-d54722d_290526"
-    │       triggers ADO pipeline 434 (ref: env/dev) → deploys to devamp01
+    │       calls update-service-tag.yml in cp-vp-aks-deploy (3-attempt push retry)
+    │         → commits env/dev: service-cp-caseadmin-case-urn-mapper.image.tag = "1.2.5-d54722d_290526"
+    │         → push triggers trigger-k8s-deploy.yml → ADO pipeline 434 → devamp01
     │
     └── deploy-sit        SKIPPED  (deploy_sit: false)
 
@@ -101,12 +103,26 @@ Defined in `ci-build-publish.yml`:
 
 ## ACR tag format
 
-The date suffix (`_DDMMYY`) is appended by ADO pipeline 460 when it copies the image from GHCR to ACR. Our workflow reconstructs the same suffix at deploy time using `date -u +'%d%m%y'` so that `action-ado-deploy@v1` writes the correct matching tag to `services_values.yml`.
+The date suffix (`_DDMMYY`) is appended by ADO pipeline 460 when it copies the image from GHCR to ACR. The `compute-acr-tag` job reconstructs the same suffix using `date -u +'%d%m%y'` and passes the full tag to `update-service-tag.yml`, which writes it to `services_values.yml`.
 
 | Build type | `artefact_version` | `tag_suffix` | Final ACR tag |
 |---|---|---|---|
 | Dev CI | `1.2.5-d54722d` | `_290526` | `1.2.5-d54722d_290526` |
 | Release | `1.2.6` | `_010626` | `1.2.6_010626` |
+
+---
+
+## Concurrent release safety
+
+`deploy-dev` and `deploy-sit` call `update-service-tag.yml` in `cp-vp-aks-deploy` — a reusable workflow that commits the image tag directly to the environment branch. When multiple services release on the same day their deploy jobs run in parallel. If two services push to the same branch simultaneously, the second push is rejected (non-fast-forward). The workflow retries up to three times, rebasing between attempts:
+
+```bash
+for attempt in 1 2 3; do
+  git push origin env/sit || git pull --rebase origin env/sit
+done
+```
+
+Because each service edits its own isolated key in `services_values.yml`, rebases always succeed without conflicts. Both image tags are written, and both services deploy to the environment in sequence via `trigger-k8s-deploy.yml`.
 
 ---
 
