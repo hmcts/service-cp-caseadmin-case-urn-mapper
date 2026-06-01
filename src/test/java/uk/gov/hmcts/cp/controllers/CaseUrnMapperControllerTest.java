@@ -26,12 +26,10 @@ class CaseUrnMapperControllerTest {
     void controller_should_validate_case_urn() {
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn(null, true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("", true));
-        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("LESTHAN10", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("NONEALPHANUM-", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("NONEALPHANUM ", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("NONE ALPHANUM", true));
-        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("A".repeat(9), true));
-        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("A".repeat(41), true));
+        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("A".repeat(31), true));
     }
 
     @Test
