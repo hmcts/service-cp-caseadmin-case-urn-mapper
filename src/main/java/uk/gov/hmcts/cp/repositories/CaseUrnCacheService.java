@@ -13,6 +13,8 @@ import uk.gov.hmcts.cp.client.UrnMapperResponse;
 import uk.gov.hmcts.cp.config.CachingConfig;
 import uk.gov.hmcts.cp.openapi.model.CaseMapperResponse;
 
+import java.util.UUID;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -45,7 +47,7 @@ public class CaseUrnCacheService {
         final ResponseEntity<UrnMapperResponse> responseEntity = caseUrnMapperClient.getCaseFileByCaseUrn(unescapedCaseUrn);
         return CaseMapperResponse.builder()
                 .caseUrn(responseEntity.getBody().getSourceId())
-                .caseId(responseEntity.getBody().getTargetId())
+                .caseId(UUID.fromString(responseEntity.getBody().getTargetId()))
                 .build();
     }
 }
