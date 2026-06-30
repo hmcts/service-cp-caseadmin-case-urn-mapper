@@ -30,7 +30,7 @@ class CaseUrnMapperRepositoryTest {
 
         CaseMapperResponse caseMapperResponse = CaseMapperResponse.builder()
                 .caseUrn(caseUrn)
-                .caseId("mock-case-id")
+                .caseId(UUID.fromString("00000000-0000-0000-0000-000000000001"))
                 .build();
         when(cacheService.getCaseIdAndRefreshCache(caseUrn)).thenReturn(caseMapperResponse);
         when(cacheService.getCachedCaseId(caseUrn)).thenReturn(caseMapperResponse);
@@ -48,7 +48,7 @@ class CaseUrnMapperRepositoryTest {
 
         CaseMapperResponse caseMapperResponse = CaseMapperResponse.builder()
                 .caseUrn(caseUrn)
-                .caseId("mock-case-id")
+                .caseId(UUID.fromString("00000000-0000-0000-0000-000000000001"))
                 .build();
         when(cacheService.getCaseIdAndRefreshCache(caseUrn)).thenReturn(caseMapperResponse);
         when(cacheService.getCachedCaseId(caseUrn)).thenReturn(caseMapperResponse);

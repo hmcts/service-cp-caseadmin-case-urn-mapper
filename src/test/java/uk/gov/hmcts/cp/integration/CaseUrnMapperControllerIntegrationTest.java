@@ -91,7 +91,7 @@ class CaseUrnMapperControllerIntegrationTest {
                 .andExpect(jsonPath("$.caseUrn").value(caseUrn))
                 .andExpect(jsonPath("$.caseId").value(caseId));
 
-        UrnMapperResponse response2 = UrnMapperResponse.builder().sourceId(caseUrn).targetId("ANOTHER").build();
+        UrnMapperResponse response2 = UrnMapperResponse.builder().sourceId(caseUrn).targetId("cccccccc-0000-0000-0000-000000000003").build();
         stubMappingResponse(response2);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", caseUrn))
                 .andDo(print())
@@ -102,21 +102,23 @@ class CaseUrnMapperControllerIntegrationTest {
 
     @Test
     void refresh_true_should_return_new_value() throws Exception {
-        UrnMapperResponse response1 = UrnMapperResponse.builder().sourceId("DAAA123123").targetId("ORIG").build();
+        String origId = "aaaaaaaa-0000-0000-0000-000000000001";
+        String changedId = "bbbbbbbb-0000-0000-0000-000000000002";
+        UrnMapperResponse response1 = UrnMapperResponse.builder().sourceId("DAAA123123").targetId(origId).build();
         stubMappingResponse(response1);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=false", "DAAA123123"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.caseUrn").value("DAAA123123"))
-                .andExpect(jsonPath("$.caseId").value("ORIG"));
+                .andExpect(jsonPath("$.caseId").value(origId));
 
-        UrnMapperResponse response2 = UrnMapperResponse.builder().sourceId("DAAA123123").targetId("CHANGED").build();
+        UrnMapperResponse response2 = UrnMapperResponse.builder().sourceId("DAAA123123").targetId(changedId).build();
         stubMappingResponse(response2);
         mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", "DAAA123123"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.caseUrn").value("DAAA123123"))
-                .andExpect(jsonPath("$.caseId").value("CHANGED"));
+                .andExpect(jsonPath("$.caseId").value(changedId));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.cp.services;
 
 import org.junit.jupiter.api.BeforeEach;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.cp.openapi.model.CaseMapperResponse;
@@ -28,7 +29,7 @@ class CaseUrnMapperServiceTest {
 
         CaseMapperResponse caseMapperResponse = CaseMapperResponse.builder()
                 .caseUrn(caseUrn)
-                .caseId("mock-case-id")
+                .caseId(UUID.fromString("00000000-0000-0000-0000-000000000001"))
                 .build();
 
         when(caseUrnMapperRepository.getCaseIdByCaseUrn(caseUrn, true)).thenReturn(caseMapperResponse);
