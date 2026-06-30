@@ -35,7 +35,7 @@ configurations {
 dependencies {
   // Api spec
   apiSpec "uk.gov.hmcts.cp:api-cp-caseadmin-case-urn-mapper:1.1.1"
-  implementation "io.swagger.core.v3:swagger-annotations:2.2.51"
+  implementation "io.swagger.core.v3:swagger-annotations:2.2.52"
 
 
   // Java core
