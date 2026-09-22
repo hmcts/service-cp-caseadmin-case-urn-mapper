@@ -34,7 +34,7 @@ public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
     private String validateCaseUrn(final String caseUrn) {
         if (caseUrn == null || !caseUrn.matches(CASE_URN_REGEX)) {
             log.info("CaseUrn {} does not match expected caseRegex:{}", Encode.forJava(caseUrn), CASE_URN_REGEX);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Case urn must be 1-30 alphanumerics, optionally suffixed with a hyphen and digits");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Case urn must be between 1 and 30 alphanumerics");
         }
         return caseUrn;
     }
