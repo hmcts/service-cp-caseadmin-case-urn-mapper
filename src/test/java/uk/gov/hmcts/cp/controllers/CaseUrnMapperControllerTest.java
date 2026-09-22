@@ -30,6 +30,9 @@ class CaseUrnMapperControllerTest {
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("NONEALPHANUM ", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("NONE ALPHANUM", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("A".repeat(31), true));
+        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("-1", true));
+        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("32D90374026-", true));
+        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("32D90374026-A", true));
     }
 
     @Test
@@ -37,6 +40,13 @@ class CaseUrnMapperControllerTest {
         when(caseUrnMapperService.getCaseIdByCaseUrn("CT98KRYCAP", true)).thenReturn(CaseMapperResponse.builder().build());
         caseUrnMapperController.getCaseIdByCaseUrn("CT98KRYCAP", true);
         verify(caseUrnMapperService).getCaseIdByCaseUrn("CT98KRYCAP", true);
+    }
+
+    @Test
+    void controller_should_call_service_withHyphenatedSuffix() {
+        when(caseUrnMapperService.getCaseIdByCaseUrn("32D90374026-1", true)).thenReturn(CaseMapperResponse.builder().build());
+        caseUrnMapperController.getCaseIdByCaseUrn("32D90374026-1", true);
+        verify(caseUrnMapperService).getCaseIdByCaseUrn("32D90374026-1", true);
     }
 
     @Test
