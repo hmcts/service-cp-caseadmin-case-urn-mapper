@@ -1,12 +1,12 @@
 plugins {
   id 'application'
   id 'java'
-  id 'org.springframework.boot' version '4.1.0'
+  id 'org.springframework.boot' version '4.1.1'
   id 'io.spring.dependency-management' version '1.1.7'
   id 'jacoco'
   id 'maven-publish'
-  id "com.github.ben-manes.versions" version "0.54.0"
-  id "org.cyclonedx.bom" version "3.2.4"
+  id "com.github.ben-manes.versions" version "0.64.0"
+  id "org.cyclonedx.bom" version "3.4.1"
   id 'com.avast.gradle.docker-compose' version '0.17.21'
 }
 
@@ -35,7 +35,7 @@ configurations {
 dependencies {
   // Api spec
   apiSpec "uk.gov.hmcts.cp:api-cp-caseadmin-case-urn-mapper:1.1.1"
-  implementation "io.swagger.core.v3:swagger-annotations:2.2.52"
+  implementation "io.swagger.core.v3:swagger-annotations:2.2.55"
 
 
   // Java core
@@ -46,10 +46,10 @@ dependencies {
   implementation "org.owasp.encoder:encoder:1.4.0"
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-  compileOnly "org.projectlombok:lombok:1.18.46"
-  annotationProcessor "org.projectlombok:lombok:1.18.46"
-  testCompileOnly "org.projectlombok:lombok:1.18.46"
-  testAnnotationProcessor "org.projectlombok:lombok:1.18.46"
+  compileOnly "org.projectlombok:lombok:1.18.48"
+  annotationProcessor "org.projectlombok:lombok:1.18.48"
+  testCompileOnly "org.projectlombok:lombok:1.18.48"
+  testAnnotationProcessor "org.projectlombok:lombok:1.18.48"
 
   implementation "org.mapstruct:mapstruct:1.6.3"
   annotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"
@@ -69,6 +69,6 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
   implementation 'io.jsonwebtoken:jjwt:0.13.0'
 
-  testImplementation 'org.wiremock.integrations:wiremock-spring-boot:4.2.1'
+  testImplementation 'org.wiremock.integrations:wiremock-spring-boot:4.4.1'
   testImplementation 'org.wiremock:wiremock-standalone:3.13.2'
 }
