@@ -22,6 +22,11 @@ spring:
     import: "optional:configtree:/mnt/secrets/rpe/"
   application:
     name: Spring Boot Template
+  http:
+    clients:
+      connect-timeout: ${CP_BACKEND_CONNECT_TIMEOUT:10s}
+      read-timeout: ${CP_BACKEND_READ_TIMEOUT:30s}
+      redirects: follow-when-possible
   web:
     resources:
       add-mappings: false     # disable serving any static resources

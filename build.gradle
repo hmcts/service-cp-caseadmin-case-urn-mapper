@@ -56,6 +56,7 @@ dependencies {
 
   // Spring boot core
   implementation "org.springframework.boot:spring-boot-starter-web"
+  implementation "org.springframework.boot:spring-boot-starter-restclient"
   implementation "org.springframework.boot:spring-boot-starter-aspectj"
   implementation "org.springframework.boot:spring-boot-starter-actuator"
   implementation "org.springframework.boot:spring-boot-starter-validation"
