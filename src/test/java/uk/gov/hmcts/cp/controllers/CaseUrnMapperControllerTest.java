@@ -29,7 +29,8 @@ class CaseUrnMapperControllerTest {
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("NONEALPHANUM-", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("NONEALPHANUM ", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("NONE ALPHANUM", true));
-        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("A".repeat(31), true));
+        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("A".repeat(37), true));
+        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("A".repeat(35) + "-1", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("-1", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("32D90374026-", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("32D90374026-A", true));
@@ -47,6 +48,22 @@ class CaseUrnMapperControllerTest {
         when(caseUrnMapperService.getCaseIdByCaseUrn("32D90374026-1", true)).thenReturn(CaseMapperResponse.builder().build());
         caseUrnMapperController.getCaseIdByCaseUrn("32D90374026-1", true);
         verify(caseUrnMapperService).getCaseIdByCaseUrn("32D90374026-1", true);
+    }
+
+    @Test
+    void controller_should_call_service_withMaxLengthCaseUrn() {
+        final String maxLengthCaseUrn = "A".repeat(36);
+        when(caseUrnMapperService.getCaseIdByCaseUrn(maxLengthCaseUrn, true)).thenReturn(CaseMapperResponse.builder().build());
+        caseUrnMapperController.getCaseIdByCaseUrn(maxLengthCaseUrn, true);
+        verify(caseUrnMapperService).getCaseIdByCaseUrn(maxLengthCaseUrn, true);
+    }
+
+    @Test
+    void controller_should_call_service_withMaxLengthHyphenatedCaseUrn() {
+        final String maxLengthCaseUrn = "A".repeat(34) + "-1";
+        when(caseUrnMapperService.getCaseIdByCaseUrn(maxLengthCaseUrn, true)).thenReturn(CaseMapperResponse.builder().build());
+        caseUrnMapperController.getCaseIdByCaseUrn(maxLengthCaseUrn, true);
+        verify(caseUrnMapperService).getCaseIdByCaseUrn(maxLengthCaseUrn, true);
     }
 
     @Test
