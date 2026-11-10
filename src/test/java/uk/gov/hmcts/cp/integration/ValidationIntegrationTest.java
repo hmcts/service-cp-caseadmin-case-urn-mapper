@@ -22,7 +22,7 @@ class ValidationIntegrationTest {
 
     @Test
     void non_alphanumeric_case_urn_should_throw_400() throws Exception {
-        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", "short-urn"))
+        mockMvc.perform(get("/urnmapper/{case_urn}?refresh=true", "short_urn"))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Case urn must be between 1 and 36 alphanumerics"));
