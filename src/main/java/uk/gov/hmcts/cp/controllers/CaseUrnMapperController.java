@@ -17,7 +17,7 @@ import uk.gov.hmcts.cp.services.CaseUrnMapperService;
 @RequiredArgsConstructor
 public class CaseUrnMapperController implements CaseIdByCaseUrnApi {
 
-    private static final String CASE_URN_REGEX = "^(?=.{1,36}$)[0-9a-zA-Z]+(-[0-9]+)?$";
+    private static final String CASE_URN_REGEX = "^[0-9a-zA-Z-]{1,36}$";
     private final CaseUrnMapperService caseUrnMapperService;
     private CaseMapperResponse response;
 

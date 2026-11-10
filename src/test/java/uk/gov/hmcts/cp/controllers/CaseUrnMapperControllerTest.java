@@ -2,6 +2,8 @@ package uk.gov.hmcts.cp.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,14 +28,20 @@ class CaseUrnMapperControllerTest {
     void controller_should_validate_case_urn() {
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn(null, true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("", true));
-        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("NONEALPHANUM-", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("NONEALPHANUM ", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("NONE ALPHANUM", true));
+        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("NONE_ALPHANUM", true));
+        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("CASE/URN", true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("A".repeat(37), true));
         assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("A".repeat(35) + "-1", true));
-        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("-1", true));
-        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("32D90374026-", true));
-        assertThrows(ResponseStatusException.class, () -> caseUrnMapperController.getCaseIdByCaseUrn("32D90374026-A", true));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"32D90374026-A", "ABC-DEF-123", "APP-REF-1", "-1", "32D90374026-"})
+    void controller_should_call_service_withHyphensAnywhere(final String caseUrn) {
+        when(caseUrnMapperService.getCaseIdByCaseUrn(caseUrn, true)).thenReturn(CaseMapperResponse.builder().build());
+        caseUrnMapperController.getCaseIdByCaseUrn(caseUrn, true);
+        verify(caseUrnMapperService).getCaseIdByCaseUrn(caseUrn, true);
     }
 
     @Test
