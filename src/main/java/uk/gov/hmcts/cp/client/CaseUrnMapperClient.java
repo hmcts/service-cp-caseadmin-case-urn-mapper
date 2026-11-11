@@ -1,6 +1,7 @@
 package uk.gov.hmcts.cp.client;
 
 import io.micrometer.common.util.StringUtils;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -53,7 +54,8 @@ public class CaseUrnMapperClient {
     public HttpEntity<String> getRequestEntity() {
         final HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.ACCEPT, "application/vnd.systemid.mapping+json");
-        headers.add(CJSCPPUID_HEADER, getCjscppuid());
+        // The JDK HttpClient rejects null header values; HttpURLConnection sent them as empty.
+        headers.add(CJSCPPUID_HEADER, Objects.toString(getCjscppuid(), ""));
         return new HttpEntity<>(headers);
     }
 
